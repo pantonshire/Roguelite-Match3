@@ -142,7 +142,6 @@ class Enemy(room: RoomState, pos: Tile, val group: String, val id: Int): Entity(
             bone!!.draw(canvas)
         }
 
-
         sprite.setRegion(0, 0, 24, 24)
         super.draw(canvas)
     }

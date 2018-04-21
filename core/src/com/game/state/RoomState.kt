@@ -67,16 +67,16 @@ class RoomState: State() {
                     lastEntity = currentEntity
                 }
 
+                currentEntity.endIdle()
+                if(currentEntity.act()) {
+                    delay = maxOf(delay, currentEntity.actionDelay())
+                }
+
                 if(currentEntity.isFinished() || currentEntity.dead) {
                     turnQueue.removeAt(0)
                     currentEntity.endTurn()
                     delay = maxOf(delay, currentEntity.actionDelay())
 
-                } else {
-                    currentEntity.endIdle()
-                    if(currentEntity.act()) {
-                        delay = maxOf(delay, currentEntity.actionDelay())
-                    }
                 }
 
             }
@@ -94,13 +94,14 @@ class RoomState: State() {
 
         entities.asSequence().forEach { it.drawBG(canvas) }
         entities.asSequence().forEach { it.draw(canvas) }
-        entities.asSequence().forEach { it.drawFG(canvas) }
 
         particles.asSequence().forEach {
             it.draw(canvas)
         }
 
         if(isPlayerTurn()) {
+            entities.asSequence().forEach { it.drawFG(canvas) }
+
             for(i in 1 until turnQueue.size) {
                 canvas.drawText(i.toString(),
                         turnQueue[i].pos.x.toFloat() * tiles.tileSize + 2,
