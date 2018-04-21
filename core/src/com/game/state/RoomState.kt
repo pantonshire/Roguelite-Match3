@@ -22,13 +22,15 @@ class RoomState: State() {
     var delay = 0
     var lastEntity: Entity? = null
 
+
     init {
         entities.add(player)
         entities.add(Enemy(this, Tile(10, 2), "skeleton"))
-        entities.add(Enemy(this, Tile(11, 3), "bob"))
+        entities.add(Enemy(this, Tile(11, 3), "skeleton"))
         entities.add(Enemy(this, Tile(12, 2), "skeleton"))
         entities.add(Enemy(this, Tile(13, 2), "skeleton"))
     }
+
 
     override fun update() {
         if(delay <= 0) {
@@ -67,6 +69,7 @@ class RoomState: State() {
         }
     }
 
+
     override fun drawGame(canvas: GameCanvas) {
         tiles.draw(canvas)
         entities.asSequence().forEach {
@@ -74,16 +77,19 @@ class RoomState: State() {
         }
     }
 
+
     override fun drawHUD(canvas: GameCanvas) {
         for(i in 0 until Run.current.maxHealth) {
             canvas.draw(Textures.get(if(i >= Run.current.health) "empty_heart" else "heart"), 20f * i + 340f, 580f)
         }
     }
 
+
     private fun newRound() {
         ++round
         turnQueue = entities.sortedWith(compareBy({ -it.currentSpeed() })).toMutableList()
         lastEntity = null
+        chooseEnemyIntentions()
     }
 
     private fun killEntity(entity: Entity) {
@@ -95,7 +101,17 @@ class RoomState: State() {
         entity.onDied()
     }
 
-    fun isEmpty(tile: Tile, vararg ignore: Entity): Boolean {
+
+    private fun chooseEnemyIntentions() {
+        entities.asSequence().forEach {
+            if(it is Enemy) {
+                it.chooseIntentions()
+            }
+        }
+    }
+
+
+    fun isEmpty(tile: Tile, futurePositions: Boolean = false, vararg ignore: Entity): Boolean {
         if(tiles.isSolid(tile)) {
             return false
         }
@@ -109,6 +125,7 @@ class RoomState: State() {
         return true
     }
 
+
     fun entityAt(tile: Tile, vararg ignore: Entity): Entity? {
         entities.asSequence().forEach {
             if(it !in ignore && it.pos.x == tile.x && it.pos.y == tile.y) {
@@ -118,6 +135,7 @@ class RoomState: State() {
 
         return null
     }
+
 
     fun checkForMatch() {
         entities.asSequence().forEach {
@@ -148,4 +166,5 @@ class RoomState: State() {
             }
         }
     }
+
 }

@@ -10,6 +10,11 @@ class Angle(rad: Double = 0.0) {
 
     fun set(angle: Double) { radians = clamp(angle) }
 
+    fun setDegrees(degrees: Double): Angle {
+        set(degrees / Const.TO_DEGREES)
+        return this
+    }
+
     fun sin(): Double = Math.sin(radians)
 
     fun cos(): Double = Math.cos(radians)

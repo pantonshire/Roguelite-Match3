@@ -1,5 +1,6 @@
 package tilemap
 
+import com.game.entity.Enemy
 import com.game.maths.Direction
 import com.game.maths.Tile
 import com.game.state.RoomState
@@ -9,10 +10,11 @@ class PathFinder(val room: RoomState) {
     var nodes: MutableMap<Tile, Node> = mutableMapOf()
     var start: Tile = Tile(0, 0)
     var destination: Tile = Tile(0, 0)
+    var avoidGroup: String = "none"
 
 
-    fun getDirectionSequence(start: Tile, destination: Tile): MutableList<Direction> {
-        val pointPath = findPath(start, destination)
+    fun getDirectionSequence(start: Tile, destination: Tile, avoidGroup: String): MutableList<Direction> {
+        val pointPath = findPath(start, destination, avoidGroup)
         val directionPath: MutableList<Direction> = mutableListOf()
 
         var currentPos: Tile = start
@@ -33,9 +35,10 @@ class PathFinder(val room: RoomState) {
     }
 
 
-    fun findPath(start: Tile, destination: Tile): MutableList<Tile> {
+    fun findPath(start: Tile, destination: Tile, avoidGroup: String): MutableList<Tile> {
         this.start = start
         this.destination = destination
+        this.avoidGroup = avoidGroup
         nodes = mutableMapOf()
 
         val path: MutableList<Tile> = mutableListOf()
@@ -73,7 +76,7 @@ class PathFinder(val room: RoomState) {
                         open += it
                     }
 
-                    val newG = current.g + getWeight(it.pos)
+                    val newG = current.g + getWeight(it)
                     if(it.g < 0f || newG < it.g) {
                         it.g = newG
                         it.previous = current
@@ -143,8 +146,41 @@ class PathFinder(val room: RoomState) {
     }
 
 
-    private fun getWeight(pos: Tile): Int {
-        return 1
+    private fun getWeight(node: Node): Int {
+        var consecutiveEnemies = 0
+        var chainedEnemies = 0
+
+        val neighbours = getNeighbours(node)
+        neighbours.asSequence().forEach {
+            val neighbourEntity = room.entityAt(it.pos)
+            if(neighbourEntity is Enemy) {
+                if(neighbourEntity.group == avoidGroup) {
+                    ++consecutiveEnemies
+
+                    val direction = when {
+                        it.pos.x > node.pos.x -> Direction.EAST
+                        it.pos.x < node.pos.x -> Direction.WEST
+                        it.pos.y > node.pos.y -> Direction.NORTH
+                        it.pos.y < node.pos.y -> Direction.SOUTH
+                        else -> Direction.NORTH
+                    }
+
+                    val chainEntity = room.entityAt(it.pos.offset(direction))
+                    if(chainEntity is Enemy) {
+                        if(chainEntity.group == avoidGroup) {
+                            ++chainedEnemies
+                        }
+                    }
+                }
+            }
+        }
+
+        if(consecutiveEnemies > 1) {
+            chainedEnemies += consecutiveEnemies - 1
+            consecutiveEnemies = 1
+        }
+
+        return 1 + 5 * consecutiveEnemies + 100 * chainedEnemies
     }
 
 }
