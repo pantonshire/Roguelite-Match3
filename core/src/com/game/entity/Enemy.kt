@@ -14,7 +14,7 @@ import com.game.run.Run
 import com.game.state.RoomState
 import tilemap.PathFinder
 
-class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.0) {
+class Enemy(room: RoomState, pos: Tile, val group: String, val id: Int): Entity(room, pos, 9.0) {
 
     override val sprite: TextureRegion = TextureRegion(Textures.get("skeleton"))
     override val bounceHeight: Double = 5.0
@@ -138,16 +138,6 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
 
 
     override fun draw(canvas: GameCanvas) {
-        if(!path.isEmpty()) {
-            val pathTexture = Textures.get("enemy_path")
-            canvas.tint(Color(1.0f, 1.0f, 1.0f, 0.25f))
-            canvas.draw(pathTexture, (pos.x * tiles.tileSize + tiles.tileSize / 2).toFloat(), (pos.y * tiles.tileSize + tiles.tileSize / 2).toFloat())
-            path.asSequence().forEach {
-                canvas.draw(pathTexture, (it.x * tiles.tileSize + tiles.tileSize / 2).toFloat(), (it.y * tiles.tileSize + tiles.tileSize / 2).toFloat())
-            }
-            canvas.removeTint()
-        }
-
         if(bone != null) {
             bone!!.draw(canvas)
         }
@@ -155,7 +145,24 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
 
         sprite.setRegion(0, 0, 24, 24)
         super.draw(canvas)
+    }
 
+
+    override fun drawBG(canvas: GameCanvas) {
+        if(!path.isEmpty()) {
+            val pathTexture = Textures.get("enemy_path")
+            val pathColour = getPathColour()
+            canvas.tint(Color(pathColour.r, pathColour.g, pathColour.b, 0.25f))
+            canvas.draw(pathTexture, (pos.x * tiles.tileSize + tiles.tileSize / 2).toFloat(), (pos.y * tiles.tileSize + tiles.tileSize / 2).toFloat())
+            path.asSequence().forEach {
+                canvas.draw(pathTexture, (it.x * tiles.tileSize + tiles.tileSize / 2).toFloat(), (it.y * tiles.tileSize + tiles.tileSize / 2).toFloat())
+            }
+            canvas.removeTint()
+        }
+    }
+
+
+    override fun drawFG(canvas: GameCanvas) {
         if(attackDirection != null) {
 
             val arrow = Textures.get("arrow")
@@ -237,6 +244,23 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
         if(attackDirection != null) {
             bone = Bone(room, pos.copy(), attackDirection ?: Direction.NORTH)
             attackDirection = null
+        }
+    }
+
+
+    private fun getPathColour(): Color {
+        return when(id % 10) {
+            0 -> Color.WHITE
+            1 -> Color.BLUE
+            2 -> Color.RED
+            3 -> Color.GREEN
+            4 -> Color.YELLOW
+            5 -> Color.PURPLE
+            6 -> Color.CORAL
+            7 -> Color.FIREBRICK
+            8 -> Color.LIME
+            9 -> Color.PINK
+            else -> Color.WHITE
         }
     }
 

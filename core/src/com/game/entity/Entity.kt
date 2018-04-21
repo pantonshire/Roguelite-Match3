@@ -87,6 +87,9 @@ abstract class Entity(val room: RoomState, val pos: Tile, private val speed: Dou
         }
     }
 
+    open fun drawBG(canvas: GameCanvas) {}
+    open fun drawFG(canvas: GameCanvas) {}
+
     open fun onMoved(lastPos: Tile) {}
 
     abstract fun act(): Boolean

@@ -1,5 +1,6 @@
 package com.game.state
 
+import com.badlogic.gdx.graphics.Color
 import com.game.entity.Entity
 import com.game.entity.Player
 import com.game.entity.Enemy
@@ -30,10 +31,10 @@ class RoomState: State() {
 
     init {
         entities.add(player)
-        entities.add(Enemy(this, Tile(10, 2), "skeleton"))
-        entities.add(Enemy(this, Tile(11, 3), "skeleton"))
-        entities.add(Enemy(this, Tile(12, 2), "skeleton"))
-        entities.add(Enemy(this, Tile(13, 2), "skeleton"))
+        entities.add(Enemy(this, Tile(10, 2), "skeleton", 0))
+        entities.add(Enemy(this, Tile(11, 3), "skeleton", 1))
+        entities.add(Enemy(this, Tile(12, 2), "skeleton", 2))
+        entities.add(Enemy(this, Tile(13, 2), "skeleton", 3))
     }
 
 
@@ -90,12 +91,22 @@ class RoomState: State() {
 
     override fun drawGame(canvas: GameCanvas) {
         tiles.draw(canvas)
-        entities.asSequence().forEach {
-            it.draw(canvas)
-        }
+
+        entities.asSequence().forEach { it.drawBG(canvas) }
+        entities.asSequence().forEach { it.draw(canvas) }
+        entities.asSequence().forEach { it.drawFG(canvas) }
 
         particles.asSequence().forEach {
             it.draw(canvas)
+        }
+
+        if(isPlayerTurn()) {
+            for(i in 1 until turnQueue.size) {
+                canvas.drawText(i.toString(),
+                        turnQueue[i].pos.x.toFloat() * tiles.tileSize + 2,
+                        turnQueue[i].pos.y.toFloat() * tiles.tileSize + tiles.tileSize + 6,
+                        "orangekid", 12, Color.WHITE)
+            }
         }
     }
 
@@ -137,6 +148,9 @@ class RoomState: State() {
             }
         }
     }
+
+
+    private fun isPlayerTurn(): Boolean = !turnQueue.isEmpty() && turnQueue.first() is Player
 
 
     fun isEmpty(tile: Tile, futurePositions: Boolean = false, vararg ignore: Entity): Boolean {
