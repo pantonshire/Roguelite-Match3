@@ -14,6 +14,7 @@ class RoomState: State() {
     val entities: MutableList<Entity> = mutableListOf()
 
     var turnQueue: MutableList<Entity> = mutableListOf()
+    val killSet: MutableSet<Entity> = mutableSetOf()
     var round = 0
     var delay = 0
     var lastEntity: Entity? = null
@@ -21,15 +22,25 @@ class RoomState: State() {
     init {
         entities.add(Player(this, Tile(0, 0)))
         entities.add(Enemy(this, Tile(10, 2)))
+        entities.add(Enemy(this, Tile(11, 3)))
+        entities.add(Enemy(this, Tile(12, 2)))
+        entities.add(Enemy(this, Tile(13, 2)))
     }
 
     override fun update() {
-        if(entities.isNotEmpty()) {
-            if(turnQueue.isEmpty()) {
-                newRound()
+        if(delay <= 0) {
+            if(killSet.isNotEmpty()) {
+                killSet.asSequence().forEach {
+                    killEntity(it)
+                }
             }
 
-            if(delay <= 0) {
+            if(entities.isNotEmpty()) {
+
+                if(turnQueue.isEmpty()) {
+                    newRound()
+                }
+
                 val currentEntity = turnQueue.first()
 
                 if(lastEntity != currentEntity) {
@@ -45,9 +56,9 @@ class RoomState: State() {
                     delay = currentEntity.actionDelay()
                 }
 
-            } else {
-                --delay
             }
+        } else {
+            --delay
         }
     }
 
@@ -103,8 +114,6 @@ class RoomState: State() {
     }
 
     fun checkForMatch() {
-        val enemiesToKill: MutableSet<Enemy> = mutableSetOf()
-
         entities.asSequence().forEach {
             if(it is Enemy) {
                 val rootEntity = it
@@ -122,17 +131,10 @@ class RoomState: State() {
                     }
 
                     if(chain.size >= 3) {
-                        enemiesToKill.addAll(chain)
+                        killSet.addAll(chain)
+                        delay = 20
                     }
                 }
-
-
-            }
-        }
-
-        if(enemiesToKill.isNotEmpty()) {
-            enemiesToKill.asSequence().forEach {
-                killEntity(it)
             }
         }
     }
