@@ -14,6 +14,7 @@ import tilemap.PathFinder
 class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.0) {
 
     override val sprite: TextureRegion = TextureRegion(Textures.get("skeleton"))
+    override val bounceHeight: Double = 5.0
 
     val maxMoves = 3
 
@@ -56,6 +57,7 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
             }
 
             else {
+                bone!!.endIdle()
                 bone!!.act()
                 return true
             }
@@ -64,7 +66,7 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
             return true
         }
 
-        return false
+        return true
     }
 
 
@@ -98,6 +100,14 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
         }
 
         return super.actionDelay()
+    }
+
+
+    override fun idle() {
+        super.idle()
+        if(bone != null) {
+            bone!!.idle()
+        }
     }
 
 

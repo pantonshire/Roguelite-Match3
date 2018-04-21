@@ -14,15 +14,13 @@ import com.game.state.RoomState
 class Bone(room: RoomState, pos: Tile, val direction: Direction): Entity(room, pos, 0.0) {
 
     override val sprite: TextureRegion = TextureRegion(Textures.get("bone"))
+    override val bounceHeight: Double = 0.0
 
     var movesLeft: Int = 10
     var collided: Boolean = false
     var horizontal: Boolean = false
-    var waitingTicks: Int = 0
 
     override fun act(): Boolean {
-        waitingTicks = 0
-
         forceMove(direction)
         if(!room.isEmpty(pos)) {
             val hitEntity = room.entityAt(pos)
@@ -66,16 +64,5 @@ class Bone(room: RoomState, pos: Tile, val direction: Direction): Entity(room, p
     override fun draw(canvas: GameCanvas) {
         sprite.setRegion(if(horizontal) 15 else 0, 0, 15, 15)
         super.draw(canvas)
-        ++waitingTicks
-    }
-
-    override fun drawPos(): Vector {
-        if(collided) {
-            return super.drawPos()
-        }
-
-        val offset: Vector = Vector(direction.x.toDouble() * waitingTicks, direction.y.toDouble() * waitingTicks)
-        offset *= tiles.tileSize.toDouble() / actionDelay().toDouble()
-        return super.drawPos() + offset
     }
 }

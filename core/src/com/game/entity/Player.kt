@@ -12,6 +12,7 @@ import com.game.state.RoomState
 class Player(room: RoomState, pos: Tile): Entity(room, pos, 10.0) {
 
     override val sprite: TextureRegion = TextureRegion(Textures.get("hero"))
+    override val bounceHeight: Double = 5.0
 
     var movesLeft: Int = 0
     var attacked: Boolean = false

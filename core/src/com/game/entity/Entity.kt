@@ -15,6 +15,7 @@ abstract class Entity(val room: RoomState, val pos: Tile, private val speed: Dou
     var lastDirection: Direction = Direction.NORTH
 
     abstract val sprite: TextureRegion
+    abstract val bounceHeight: Double
 
     var dead: Boolean = false
     var idleTicks: Int = 0
@@ -42,17 +43,21 @@ abstract class Entity(val room: RoomState, val pos: Tile, private val speed: Dou
         onMoved(lastPos)
     }
 
-    fun endIdle() {
+    open fun idle() {
+        ++idleTicks
+    }
+
+    open fun endIdle() {
         idleTicks = 0
         lastPos.set(pos.x, pos.y)
     }
 
     open fun drawPos(): Vector {
-        return if(pos != lastPos) {
+        return if(pos.x != lastPos.x || pos.y != lastPos.y) {
             tiles.getPositionOf(lastPos) +
                     (Vector(lastDirection.x.toDouble(), lastDirection.y.toDouble())
                             * (idleTicks * tiles.tileSize.toDouble() / actionDelay().toDouble())) +
-                    Vector(0.0, Math.sin(Math.PI * idleTicks.toDouble() / actionDelay().toDouble()) * 5.0)
+                    Vector(0.0, Math.sin(Math.PI * idleTicks.toDouble() / actionDelay().toDouble()) * bounceHeight)
         } else {
             tiles.getPositionOf(pos)
         }

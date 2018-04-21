@@ -43,32 +43,35 @@ class RoomState: State() {
             if(entities.isNotEmpty()) {
 
                 if(turnQueue.isEmpty()) {
+                    lastEntity?.endIdle()
                     newRound()
                 }
 
                 val currentEntity = turnQueue.first()
 
                 if(lastEntity != currentEntity) {
+                    lastEntity?.endIdle()
                     currentEntity.startTurn()
                     lastEntity = currentEntity
-                }
-
-                currentEntity.endIdle()
-                if(currentEntity.act()) {
-                    delay = maxOf(delay, currentEntity.actionDelay())
                 }
 
                 if(currentEntity.isFinished()) {
                     turnQueue.removeAt(0)
                     currentEntity.endTurn()
+                    delay = maxOf(delay, currentEntity.actionDelay())
 
+                } else {
+                    currentEntity.endIdle()
+                    if(currentEntity.act()) {
+                        delay = maxOf(delay, currentEntity.actionDelay())
+                    }
                 }
 
             }
         } else {
             --delay
             if(turnQueue.isNotEmpty()) {
-                turnQueue.first().idleTicks += 1
+                turnQueue.first().idle()
             }
         }
     }
