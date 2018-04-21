@@ -21,7 +21,7 @@ object StateManager {
                 GameCanvas(1.0f)    //HUD canvas
         )
 
-        layers[0].setCameraPosition(0f, 0f)
+        layers[0].setCameraPosition(320f, 200f)
 
         current = RoomState()
     }

@@ -3,6 +3,8 @@ package tilemap
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.game.graphics.GameCanvas
 import com.game.graphics.Textures
+import com.game.maths.Tile
+import com.game.maths.Vector
 
 class TileMap(val width: Int, val height: Int, val tileSize: Int, tileSet: String, val tilesPerRow: Int) {
 
@@ -33,10 +35,14 @@ class TileMap(val width: Int, val height: Int, val tileSize: Int, tileSet: Strin
         }
     }
 
+    fun isSolid(tile: Tile) = tile.x !in (0 until width) || tile.y !in (0 until height) || rowOf(tiles[tile.x][tile.y]) == 1
+
+    fun getMapCoordinates(pos: Vector): Tile = Tile((pos.x / tileSize).toInt(), (pos.y / tileSize).toInt())
+
+    fun getPositionOf(tile: Tile): Vector = Vector((tile.x * tileSize + tileSize / 2).toDouble(), (tile.y * tileSize + tileSize / 2).toDouble())
+
     fun rowOf(tile: Byte) = tile / tilesPerRow
 
     fun colOf(tile: Byte) = tile % tilesPerRow
-
-    fun isSolid(tile: Byte) = rowOf(tile) == 1
 
 }
