@@ -14,6 +14,7 @@ class RoomState: State() {
 
     val tiles: TileMap = TileMap(50, 50, 24, "tiles", 5)
     val entities: MutableList<Entity> = mutableListOf()
+    val player: Player = Player(this, Tile(0, 0))
 
     var turnQueue: MutableList<Entity> = mutableListOf()
     val killSet: MutableSet<Entity> = mutableSetOf()
@@ -22,7 +23,7 @@ class RoomState: State() {
     var lastEntity: Entity? = null
 
     init {
-        entities.add(Player(this, Tile(0, 0)))
+        entities.add(player)
         entities.add(Enemy(this, Tile(10, 2)))
         entities.add(Enemy(this, Tile(11, 3)))
         entities.add(Enemy(this, Tile(12, 2)))
@@ -50,12 +51,14 @@ class RoomState: State() {
                     lastEntity = currentEntity
                 }
 
+                if(currentEntity.act()) {
+                    delay = maxOf(delay, currentEntity.actionDelay())
+                }
+
                 if(currentEntity.isFinished()) {
                     turnQueue.removeAt(0)
                     currentEntity.endTurn()
 
-                } else if(currentEntity.act()) {
-                    delay = maxOf(delay, currentEntity.actionDelay())
                 }
 
             }

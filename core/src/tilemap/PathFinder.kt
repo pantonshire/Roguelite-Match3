@@ -11,11 +11,29 @@ class PathFinder(val room: RoomState) {
     var destination: Tile = Tile(0, 0)
 
 
+    fun getDirectionSequence(start: Tile, destination: Tile): MutableList<Direction> {
+        val pointPath = findPath(start, destination)
+        val directionPath: MutableList<Direction> = mutableListOf()
 
+        var currentPos: Tile = start
+
+        pointPath.asSequence().forEach {
+            directionPath += when {
+                currentPos.x < it.x -> Direction.EAST
+                currentPos.x > it.x -> Direction.WEST
+                currentPos.y < it.y -> Direction.NORTH
+                currentPos.y > it.y -> Direction.SOUTH
+                else -> Direction.NORTH
+            }
+
+            currentPos = it
+        }
+
+        return directionPath
+    }
 
 
     fun findPath(start: Tile, destination: Tile): MutableList<Tile> {
-
         this.start = start
         this.destination = destination
         nodes = mutableMapOf()
@@ -28,10 +46,14 @@ class PathFinder(val room: RoomState) {
         var current: Node = startNode
         open += startNode
 
-        while(open.isNotEmpty()) {
+        var success = false
+        var loops = 0
+
+        while(open.isNotEmpty() && loops < 100) {
             current = getCheapestOpenNode(open) ?: break
 
             if(current.pos == destination) {
+                success = true
                 break
             }
 
@@ -39,7 +61,13 @@ class PathFinder(val room: RoomState) {
             closed += current
 
             val neighbours = getNeighbours(current)
+            var neighbourIsDestination = false
+
             neighbours.asSequence().filter { it !in closed }.forEach {
+                if(it.pos == destination) {
+                    neighbourIsDestination = true
+                }
+
                 if(room.isEmpty(it.pos)) {
                     if(it !in open) {
                         open += it
@@ -52,12 +80,21 @@ class PathFinder(val room: RoomState) {
                     }
                 }
             }
+
+            if(neighbourIsDestination) {
+                success = true
+                break
+            }
+
+            ++loops
         }
 
-        var reversePathNode: Node? = current
-        while(reversePathNode != null && reversePathNode != startNode) {
-            path.add(0, reversePathNode.pos)
-            reversePathNode = reversePathNode.previous
+        if(success) {
+            var reversePathNode: Node? = current
+            while(reversePathNode != null && reversePathNode != startNode) {
+                path.add(0, reversePathNode.pos)
+                reversePathNode = reversePathNode.previous
+            }
         }
 
         return path
