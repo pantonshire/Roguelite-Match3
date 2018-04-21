@@ -5,8 +5,11 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.game.graphics.GameCanvas
+import com.game.graphics.Sequences
 import com.game.graphics.Textures
 import com.game.maths.*
+import com.game.particle.AnimatedParticle
+import com.game.particle.TextParticle
 import com.game.run.Run
 import com.game.state.RoomState
 import tilemap.PathFinder
@@ -222,6 +225,7 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
 
 
     fun stun() {
+        room.particles.add(TextParticle(drawPos(), Vector(y = 1.5), 60, "STUNNED", "orangekid", 12, Color.WHITE))
         stunned = true
         attackDirection = null
         path.clear()

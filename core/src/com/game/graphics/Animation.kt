@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.game.maths.Angle
 import com.game.maths.Vector
 
-class Animation(spriteSheet: Texture, private val sequenceController: () -> Int, vararg animationSequences: AnimationSequence) {
+class Animation(spriteSheet: Texture, vararg animationSequences: AnimationSequence) {
 
     val textureRegion: TextureRegion = TextureRegion(spriteSheet)
     var originOffsetX: Float = 0.0f
@@ -17,7 +17,7 @@ class Animation(spriteSheet: Texture, private val sequenceController: () -> Int,
     val sequences: Array<out AnimationSequence> = animationSequences
     val sequenceNames: Map<String, Int>
 
-    private var sequenceNo: Int
+    private var sequenceNo: Int = 0
     private var frameNo: Int = 0
     private var timer: Int
     private var loops: Int = 0
@@ -33,7 +33,6 @@ class Animation(spriteSheet: Texture, private val sequenceController: () -> Int,
             }
         }
         sequenceNames = names.toMap()
-        sequenceNo = maxOf(sequenceController(), 0)
         timer = sequences[sequenceNo].delay
 
     }
@@ -63,7 +62,20 @@ class Animation(spriteSheet: Texture, private val sequenceController: () -> Int,
     }
 
     fun updateAnimation() {
-        val nextSequence: Int = sequenceController()
+        if(sequences[sequenceNo].delay > 0 && --timer <= 0) {
+            timer = sequences[sequenceNo].delay
+            dirty = true
+            if(++frameNo >= sequences[sequenceNo].numFrames) {
+                if(sequences[sequenceNo].shouldLoop(++loops)) {
+                    frameNo = 0
+                } else {
+                    --frameNo
+                }
+            }
+        }
+    }
+
+    fun setSequence(nextSequence: Int) {
         if(nextSequence != -1 && nextSequence != sequenceNo) {
             frameNo = when(nextSequence in sequences[sequenceNo].linkedSequences) {
                 true -> minOf(frameNo, sequences[nextSequence].numFrames - 1)
@@ -74,18 +86,6 @@ class Animation(spriteSheet: Texture, private val sequenceController: () -> Int,
             timer = sequences[sequenceNo].delay
             loops = 0
             dirty = true
-        }
-
-        else if(sequences[sequenceNo].delay > 0 && --timer <= 0) {
-            timer = sequences[sequenceNo].delay
-            dirty = true
-            if(++frameNo >= sequences[sequenceNo].numFrames) {
-                if(sequences[sequenceNo].shouldLoop(++loops)) {
-                    frameNo = 0
-                } else {
-                    --frameNo
-                }
-            }
         }
     }
 

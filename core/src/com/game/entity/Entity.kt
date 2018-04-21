@@ -19,6 +19,7 @@ abstract class Entity(val room: RoomState, val pos: Tile, private val speed: Dou
 
     var dead: Boolean = false
     var idleTicks: Int = 0
+    var knockbackTicks: Int = 0
 
 
     fun move(direction: Direction): Boolean {
@@ -43,6 +44,10 @@ abstract class Entity(val room: RoomState, val pos: Tile, private val speed: Dou
         onMoved(lastPos)
     }
 
+    fun knockback() {
+        knockbackTicks = actionDelay()
+    }
+
     open fun idle() {
         ++idleTicks
     }
@@ -54,10 +59,13 @@ abstract class Entity(val room: RoomState, val pos: Tile, private val speed: Dou
 
     open fun drawPos(): Vector {
         return if(pos.x != lastPos.x || pos.y != lastPos.y) {
+            val dist = if(knockbackTicks > 0) actionDelay() - knockbackTicks else idleTicks
+            val bounce = if(knockbackTicks > 0) 2.0 else bounceHeight
+
             tiles.getPositionOf(lastPos) +
                     (Vector(lastDirection.x.toDouble(), lastDirection.y.toDouble())
-                            * (idleTicks * tiles.tileSize.toDouble() / actionDelay().toDouble())) +
-                    Vector(0.0, Math.sin(Math.PI * idleTicks.toDouble() / actionDelay().toDouble()) * bounceHeight)
+                            * (dist * tiles.tileSize.toDouble() / actionDelay().toDouble())) +
+                    Vector(0.0, Math.sin(Math.PI * dist.toDouble() / actionDelay().toDouble()) * bounce)
         } else {
             tiles.getPositionOf(pos)
         }
@@ -70,6 +78,13 @@ abstract class Entity(val room: RoomState, val pos: Tile, private val speed: Dou
     open fun draw(canvas: GameCanvas) {
         val drawPos = drawPos()
         canvas.draw(sprite, drawPos.xf(), drawPos.yf())
+
+        if(knockbackTicks > 0) {
+            --knockbackTicks
+            if(knockbackTicks == 0) {
+                lastPos.set(pos.x, pos.y)
+            }
+        }
     }
 
     open fun onMoved(lastPos: Tile) {}

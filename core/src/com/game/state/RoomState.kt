@@ -4,15 +4,20 @@ import com.game.entity.Entity
 import com.game.entity.Player
 import com.game.entity.Enemy
 import com.game.graphics.GameCanvas
+import com.game.graphics.Sequences
 import com.game.graphics.Textures
 import com.game.maths.Direction
 import com.game.maths.Tile
+import com.game.maths.Vector
+import com.game.particle.AnimatedParticle
+import com.game.particle.Particle
 import com.game.run.Run
 import tilemap.TileMap
 
 class RoomState: State() {
 
     val tiles: TileMap = TileMap(50, 50, 24, "tiles", 5)
+    val particles: MutableList<Particle> = mutableListOf()
     val entities: MutableList<Entity> = mutableListOf()
     val player: Player = Player(this, Tile(0, 0))
 
@@ -33,6 +38,12 @@ class RoomState: State() {
 
 
     override fun update() {
+        particles.asSequence().forEach {
+            it.update()
+        }
+
+        particles.removeIf { it.shouldRemove() }
+
         if(delay <= 0) {
             if(killSet.isNotEmpty()) {
                 killSet.asSequence().forEach {
@@ -82,6 +93,10 @@ class RoomState: State() {
         entities.asSequence().forEach {
             it.draw(canvas)
         }
+
+        particles.asSequence().forEach {
+            it.draw(canvas)
+        }
     }
 
 
@@ -101,13 +116,16 @@ class RoomState: State() {
     }
 
     private fun killEntity(entity: Entity) {
-        entities.remove(entity)
-        if(entity in turnQueue) {
-            turnQueue.remove(entity)
-        }
+        if(!entity.dead) {
+            entities.remove(entity)
+            if (entity in turnQueue) {
+                turnQueue.remove(entity)
+            }
 
-        entity.dead = true
-        entity.onDied()
+            particles.add(AnimatedParticle(entity.drawPos(), Vector(), "explosion", Sequences.explosion))
+            entity.dead = true
+            entity.onDied()
+        }
     }
 
 

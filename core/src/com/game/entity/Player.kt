@@ -48,6 +48,7 @@ class Player(room: RoomState, pos: Tile): Entity(room, pos, 10.0) {
                 val target = room.entityAt(pos.offset(attackDirection))
                 if(target != null) {
                     target.move(attackDirection)
+                    target.knockback()
                     attacked = true
                     return true
                 }
