@@ -15,4 +15,8 @@ class Run {
     var health: Int         = 3
     var movements: Int      = 100
 
+    fun loseHeart() {
+        --health
+    }
+
 }

@@ -26,6 +26,8 @@ class Tile(var x: Int, var y: Int) {
         return this
     }
 
+    fun delta(other: Tile): Tile = Tile(other.x - x, other.y - y)
+
     override fun equals(other: Any?): Boolean {
         if(other is Tile) {
             return x == other.x && y == other.y

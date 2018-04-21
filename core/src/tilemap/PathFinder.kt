@@ -94,7 +94,7 @@ class PathFinder(val room: RoomState) {
         if(success) {
             var reversePathNode: Node? = current
             while(reversePathNode != null && reversePathNode != startNode) {
-                path.add(0, reversePathNode.pos)
+                path.add(0, reversePathNode.pos.copy())
                 reversePathNode = reversePathNode.previous
             }
         }

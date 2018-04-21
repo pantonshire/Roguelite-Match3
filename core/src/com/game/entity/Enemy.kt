@@ -21,19 +21,40 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
     var path: MutableList<Tile> = mutableListOf()
     var directions: MutableList<Direction> = mutableListOf()
     val futurePos: Tile = pos.copy()
+    var pathLocked = false
 
     var stunned = false
     var movesLeft: Int = 0
     var attackDirection: Direction? = null
+    var bone: Bone? = null
 
 
     override fun act(): Boolean {
         if(directions.isNotEmpty()) {
-            move(directions.first())
-            directions.removeAt(0)
-            path.removeAt(0)
-            --movesLeft
+            if(!move(directions.first())) {
+                directions.clear()
+                path.clear()
+                movesLeft = 0
+                attack()
+            } else {
+                directions.removeAt(0)
+                path.removeAt(0)
+                --movesLeft
+                if(movesLeft == 0) {
+                    attack()
+                }
+            }
             return true
+
+        } else if(bone != null) {
+            if(bone!!.isFinished()) {
+                bone = null
+            }
+
+            else {
+                bone!!.act()
+                return true
+            }
         }
 
         return false
@@ -42,6 +63,7 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
 
     override fun startTurn() {
         movesLeft = maxMoves
+        pathLocked = true
     }
 
 
@@ -49,6 +71,7 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
         path.clear()
         directions.clear()
         stunned = false
+        pathLocked = false
     }
 
 
@@ -58,7 +81,27 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
 
 
     override fun isFinished(): Boolean {
-        return path.isEmpty() || movesLeft == 0
+        return (path.isEmpty() || movesLeft == 0) && bone == null
+    }
+
+
+    override fun actionDelay(): Int {
+        if(bone != null) {
+            return 5
+        }
+
+        return super.actionDelay()
+    }
+
+
+    override fun onMoved(lastPos: Tile) {
+        super.onMoved(lastPos)
+        if(!pathLocked) {
+            val delta = lastPos.delta(pos)
+            path.asSequence().forEach {
+                it.add(delta.x, delta.y)
+            }
+        }
     }
 
 
@@ -71,6 +114,10 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
                 canvas.draw(pathTexture, (it.x * tiles.tileSize + tiles.tileSize / 2).toFloat(), (it.y * tiles.tileSize + tiles.tileSize / 2).toFloat())
             }
             canvas.removeTint()
+        }
+
+        if(bone != null) {
+            bone!!.draw(canvas)
         }
 
         super.draw(canvas)
@@ -93,6 +140,10 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
 
 
     fun chooseIntentions() {
+        if(stunned) {
+            return
+        }
+
         val player = room.player
 
         path = pathFinder.findPath(pos, player.pos, group)
@@ -115,7 +166,42 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
             player.pos.x == futurePos.x && player.pos.y > futurePos.y -> Direction.NORTH
             player.pos.x < futurePos.x && player.pos.y == futurePos.y -> Direction.WEST
             player.pos.x > futurePos.x && player.pos.y == futurePos.y -> Direction.EAST
-            else -> null
+            else -> {
+                if(RandomUtils.chance(0.5)) {
+                    val horizontal = RandomUtils.flipCoin()
+                    if(horizontal) {
+                        if(player.pos.x < futurePos.x) {
+                            Direction.WEST
+                        } else {
+                            Direction.EAST
+                        }
+                    } else {
+                        if(player.pos.y < futurePos.y) {
+                            Direction.SOUTH
+                        } else {
+                            Direction.NORTH
+                        }
+                    }
+                } else {
+                    null
+                }
+            }
+        }
+    }
+
+
+    fun stun() {
+        stunned = true
+        attackDirection = null
+        path.clear()
+        directions.clear()
+    }
+
+
+    private fun attack() {
+        if(attackDirection != null) {
+            bone = Bone(room, pos.copy(), attackDirection ?: Direction.NORTH)
+            attackDirection = null
         }
     }
 

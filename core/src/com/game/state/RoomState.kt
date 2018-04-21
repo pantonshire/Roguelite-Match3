@@ -99,6 +99,7 @@ class RoomState: State() {
             turnQueue.remove(entity)
         }
 
+        entity.dead = true
         entity.onDied()
     }
 

@@ -14,8 +14,11 @@ abstract class Entity(val room: RoomState, val pos: Tile, private val speed: Dou
 
     abstract val sprite: TextureRegion
 
+    var dead: Boolean = false
+
 
     fun move(direction: Direction): Boolean {
+        val lastPos = pos.copy()
         val newPos = pos.offset(direction)
         if(!room.isEmpty(newPos)) {
             return false
@@ -23,12 +26,15 @@ abstract class Entity(val room: RoomState, val pos: Tile, private val speed: Dou
 
         pos.add(direction)
         room.checkForMatch()
+        onMoved(lastPos)
         return true
     }
 
     fun forceMove(direction: Direction) {
+        val lastPos = pos.copy()
         pos.add(direction)
         room.checkForMatch()
+        onMoved(lastPos)
     }
 
     open fun drawPos(): Vector = tiles.getPositionOf(pos)
@@ -41,6 +47,8 @@ abstract class Entity(val room: RoomState, val pos: Tile, private val speed: Dou
         val drawPos = drawPos()
         canvas.draw(sprite, drawPos.xf(), drawPos.yf())
     }
+
+    open fun onMoved(lastPos: Tile) {}
 
     abstract fun act(): Boolean
 
