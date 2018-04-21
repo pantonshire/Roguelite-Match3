@@ -1,5 +1,6 @@
 package com.game.entity
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.game.graphics.GameCanvas
 import com.game.maths.Direction
 import com.game.maths.Tile
@@ -11,20 +12,23 @@ abstract class Entity(val room: RoomState, val pos: Tile, private val speed: Dou
 
     val tiles = room.tiles
 
+    abstract val sprite: TextureRegion
+
+
     fun move(direction: Direction): Boolean {
         val newPos = pos.offset(direction)
         if(!room.isEmpty(newPos)) {
-            println("NOT EMPTY")
             return false
         }
 
-        println("MOVED")
         pos.add(direction)
+        room.checkForMatch()
         return true
     }
 
     fun forceMove(direction: Direction) {
         pos.add(direction)
+        room.checkForMatch()
     }
 
     open fun drawPos(): Vector = tiles.getPositionOf(pos)
@@ -33,13 +37,18 @@ abstract class Entity(val room: RoomState, val pos: Tile, private val speed: Dou
 
     open fun actionDelay(): Int = 15
 
+    open fun draw(canvas: GameCanvas) {
+        val drawPos = drawPos()
+        canvas.draw(sprite, drawPos.xf(), drawPos.yf())
+    }
+
     abstract fun act(): Boolean
 
     abstract fun startTurn()
 
     abstract fun endTurn()
 
-    abstract fun isFinished(): Boolean
+    abstract fun onDied()
 
-    abstract fun draw(canvas: GameCanvas)
+    abstract fun isFinished(): Boolean
 }

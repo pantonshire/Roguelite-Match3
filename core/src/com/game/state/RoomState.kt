@@ -2,7 +2,9 @@ package com.game.state
 
 import com.game.entity.Entity
 import com.game.entity.Player
+import com.game.entity.Enemy
 import com.game.graphics.GameCanvas
+import com.game.maths.Direction
 import com.game.maths.Tile
 import tilemap.TileMap
 
@@ -18,6 +20,7 @@ class RoomState: State() {
 
     init {
         entities.add(Player(this, Tile(0, 0)))
+        entities.add(Enemy(this, Tile(10, 2)))
     }
 
     override fun update() {
@@ -66,6 +69,15 @@ class RoomState: State() {
         println("ROUND $round")
     }
 
+    private fun killEntity(entity: Entity) {
+        entities.remove(entity)
+        if(entity in turnQueue) {
+            turnQueue.remove(entity)
+        }
+
+        entity.onDied()
+    }
+
     fun isEmpty(tile: Tile, vararg ignore: Entity): Boolean {
         if(tiles.isSolid(tile)) {
             return false
@@ -78,5 +90,50 @@ class RoomState: State() {
         }
 
         return true
+    }
+
+    fun entityAt(tile: Tile, vararg ignore: Entity): Entity? {
+        entities.asSequence().forEach {
+            if(it !in ignore && it.pos.x == tile.x && it.pos.y == tile.y) {
+                return it
+            }
+        }
+
+        return null
+    }
+
+    fun checkForMatch() {
+        val enemiesToKill: MutableSet<Enemy> = mutableSetOf()
+
+        entities.asSequence().forEach {
+            if(it is Enemy) {
+                val rootEntity = it
+                val rootPos = it.pos
+
+                Direction.values().asSequence().forEach {
+                    val chain: MutableSet<Enemy> = mutableSetOf(rootEntity)
+                    for(distance in 1..10) {
+                        val nextEntity = entityAt(rootPos.offset(it, distance))
+                        if(nextEntity is Enemy) {
+                            chain += nextEntity
+                        } else {
+                            break
+                        }
+                    }
+
+                    if(chain.size >= 3) {
+                        enemiesToKill.addAll(chain)
+                    }
+                }
+
+
+            }
+        }
+
+        if(enemiesToKill.isNotEmpty()) {
+            enemiesToKill.asSequence().forEach {
+                killEntity(it)
+            }
+        }
     }
 }
