@@ -11,7 +11,7 @@ import com.game.run.Run
 import com.game.state.RoomState
 import tilemap.PathFinder
 
-class Enemy(room: RoomState, pos: Tile): Entity(room, pos, 10.0) {
+class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.0) {
 
     override val sprite: TextureRegion = TextureRegion(Textures.get("skeleton"))
 

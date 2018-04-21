@@ -49,7 +49,7 @@ class PathFinder(val room: RoomState) {
         var success = false
         var loops = 0
 
-        while(open.isNotEmpty() && loops < 100) {
+        while(open.isNotEmpty() && loops < 1000) {
             current = getCheapestOpenNode(open) ?: break
 
             if(current.pos == destination) {

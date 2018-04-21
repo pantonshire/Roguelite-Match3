@@ -35,7 +35,7 @@ abstract class Entity(val room: RoomState, val pos: Tile, private val speed: Dou
 
     open fun currentSpeed(): Double = speed
 
-    open fun actionDelay(): Int = 15
+    open fun actionDelay(): Int = 10
 
     open fun draw(canvas: GameCanvas) {
         val drawPos = drawPos()

@@ -48,7 +48,6 @@ class Player(room: RoomState, pos: Tile): Entity(room, pos, 10.0) {
                 if(target != null) {
                     target.move(attackDirection)
                     attacked = true
-                    Run.current.health -= 1
                     return true
                 }
             }

@@ -24,10 +24,10 @@ class RoomState: State() {
 
     init {
         entities.add(player)
-        entities.add(Enemy(this, Tile(10, 2)))
-        entities.add(Enemy(this, Tile(11, 3)))
-        entities.add(Enemy(this, Tile(12, 2)))
-        entities.add(Enemy(this, Tile(13, 2)))
+        entities.add(Enemy(this, Tile(10, 2), "skeleton"))
+        entities.add(Enemy(this, Tile(11, 3), "bob"))
+        entities.add(Enemy(this, Tile(12, 2), "skeleton"))
+        entities.add(Enemy(this, Tile(13, 2), "skeleton"))
     }
 
     override fun update() {
@@ -82,9 +82,8 @@ class RoomState: State() {
 
     private fun newRound() {
         ++round
-        turnQueue = entities.sortedWith(compareBy({ it.currentSpeed() })).toMutableList()
+        turnQueue = entities.sortedWith(compareBy({ -it.currentSpeed() })).toMutableList()
         lastEntity = null
-        println("ROUND $round")
     }
 
     private fun killEntity(entity: Entity) {
@@ -131,7 +130,11 @@ class RoomState: State() {
                     for(distance in 1..10) {
                         val nextEntity = entityAt(rootPos.offset(it, distance))
                         if(nextEntity is Enemy) {
-                            chain += nextEntity
+                            if(nextEntity.group == rootEntity.group) {
+                                chain += nextEntity
+                            } else {
+                                break
+                            }
                         } else {
                             break
                         }

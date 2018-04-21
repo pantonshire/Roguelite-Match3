@@ -13,6 +13,6 @@ class Run {
 
     var maxHealth: Int      = 3
     var health: Int         = 3
-    var movements: Int      = 4
+    var movements: Int      = 100
 
 }
