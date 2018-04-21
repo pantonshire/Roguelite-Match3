@@ -139,6 +139,10 @@ class GameCanvas(zoom: Float): Disposable {
         sprites.draw(texture, x, y)
     }
 
+    fun drawTile(texture: TextureRegion, x: Int, y: Int) {
+        sprites.draw(texture, x.toFloat(), y.toFloat())
+    }
+
 
     fun drawText(text: String, x: Float, y: Float, fontName: String, size: Int, colour: Color) {
         val font = Fonts.get(fontName, size)

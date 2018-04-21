@@ -1,5 +1,6 @@
 package com.game.state
 
+import com.badlogic.gdx.graphics.Color
 import com.game.graphics.Fonts
 import com.game.graphics.GameCanvas
 import com.game.graphics.Textures
@@ -19,6 +20,10 @@ object StateManager {
                 GameCanvas(0.5f),   //Game canvas
                 GameCanvas(1.0f)    //HUD canvas
         )
+
+        layers[0].setCameraPosition(0f, 0f)
+
+        current = RoomState()
     }
 
     fun tick() {
@@ -31,8 +36,6 @@ object StateManager {
 
         for(layerId in 0 until layers.size) {
             layers[layerId].beginSprites()
-            val t = Textures.get("hero")
-            layers[layerId].draw(t, 10f, 10f)
             current?.draw(layerId, layers[layerId])
             layers[layerId].finishSprites()
         }

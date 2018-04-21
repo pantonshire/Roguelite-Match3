@@ -29,6 +29,11 @@ object Fonts: Disposable {
     }
 
     fun get(font: String, size: Int): BitmapFont {
+        val key = "$font-$size"
+        if(!fonts.containsKey(key)) {
+            load(font, size)
+        }
+
         return fonts["$font-$size"] ?: default
     }
 
