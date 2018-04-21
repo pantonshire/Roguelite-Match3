@@ -29,6 +29,8 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
     var movesLeft: Int = 0
     var attackDirection: Direction? = null
     var bone: Bone? = null
+    var attack = false
+    var attacks = 0
 
 
     override fun act(): Boolean {
@@ -37,7 +39,7 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
                 directions.clear()
                 path.clear()
                 movesLeft = 0
-                attack()
+                attack = true
                 walking = false
             } else {
                 walking = true
@@ -45,7 +47,7 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
                 path.removeAt(0)
                 --movesLeft
                 if(movesLeft == 0) {
-                    attack()
+                    attack = true
                     walking = false
                 }
             }
@@ -62,7 +64,15 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
                 return true
             }
         } else {
-            attack()
+            if(attack) {
+                attack()
+                attack = false
+                ++attacks
+
+            } else if(attacks == 0) {
+                attack = true
+            }
+
             return true
         }
 
@@ -73,6 +83,8 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
     override fun startTurn() {
         movesLeft = maxMoves
         pathLocked = true
+        attack = false
+        attacks = 0
     }
 
 
@@ -90,7 +102,7 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
 
 
     override fun isFinished(): Boolean {
-        return (path.isEmpty() || movesLeft == 0) && bone == null
+        return (path.isEmpty() || movesLeft == 0) && bone == null && !attack
     }
 
 
