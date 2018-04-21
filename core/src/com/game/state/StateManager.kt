@@ -6,14 +6,19 @@ import com.game.graphics.Textures
 
 object StateManager {
 
+    val GAME_LAYER = 0
+    val HUD_LAYER = 1
+
     private var current: State? = null
     private var queued: State? = null
 
-    val gameLayer: GameCanvas = GameCanvas(0.5f, 0)
-    val hudLayer: GameCanvas = GameCanvas(1.0f, 1)
+    private var layers: Array<GameCanvas> = arrayOf()
 
     fun create() {
-
+        layers = arrayOf(
+                GameCanvas(0.5f),   //Game canvas
+                GameCanvas(1.0f)    //HUD canvas
+        )
     }
 
     fun tick() {
@@ -23,12 +28,23 @@ object StateManager {
         }
 
         current?.update()
+
+        for(layerId in 0 until layers.size) {
+            layers[layerId].beginSprites()
+            val t = Textures.get("hero")
+            layers[layerId].draw(t, 10f, 10f)
+            current?.draw(layerId, layers[layerId])
+            layers[layerId].finishSprites()
+        }
+
     }
 
     fun destroy() {
-        gameLayer.dispose()
-        hudLayer.dispose()
+        layers.asSequence().forEach { it.dispose() }
         Textures.dispose()
         Fonts.dispose()
     }
+
+    fun getCanvas(id: Int): GameCanvas = layers[id]
+
 }

@@ -7,9 +7,9 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 object Textures: Disposable {
 
     private val textures: MutableMap<String, Texture> = mutableMapOf()
-    private val unknownTexture: Texture = Texture("textures/unknown.png")
+    private val error: Texture = Texture("textures/error.png")
 
-    fun load(name: String) {
+    private fun load(name: String) {
         try {
             val texture = Texture("textures/$name.png")
             textures[name] = texture
@@ -22,7 +22,7 @@ object Textures: Disposable {
         if(!textures.containsKey(name)) {
             load(name)
         }
-        return textures[name] ?: unknownTexture
+        return textures[name] ?: error
     }
 
     override fun dispose() {
