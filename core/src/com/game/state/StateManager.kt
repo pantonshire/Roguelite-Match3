@@ -18,7 +18,7 @@ object StateManager {
     fun create() {
         layers = arrayOf(
                 GameCanvas(0.5f),   //Game canvas
-                GameCanvas(1.0f)    //HUD canvas
+                GameCanvas(0.5f)    //HUD canvas
         )
 
         layers[0].setCameraPosition(320f, 200f)

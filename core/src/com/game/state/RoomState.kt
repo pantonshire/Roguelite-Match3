@@ -4,8 +4,10 @@ import com.game.entity.Entity
 import com.game.entity.Player
 import com.game.entity.Enemy
 import com.game.graphics.GameCanvas
+import com.game.graphics.Textures
 import com.game.maths.Direction
 import com.game.maths.Tile
+import com.game.run.Run
 import tilemap.TileMap
 
 class RoomState: State() {
@@ -53,7 +55,7 @@ class RoomState: State() {
                     currentEntity.endTurn()
 
                 } else if(currentEntity.act()) {
-                    delay = currentEntity.actionDelay()
+                    delay = maxOf(delay, currentEntity.actionDelay())
                 }
 
             }
@@ -70,7 +72,9 @@ class RoomState: State() {
     }
 
     override fun drawHUD(canvas: GameCanvas) {
-
+        for(i in 0 until Run.current.maxHealth) {
+            canvas.draw(Textures.get(if(i >= Run.current.health) "empty_heart" else "heart"), 20f * i + 340f, 580f)
+        }
     }
 
     private fun newRound() {

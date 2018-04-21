@@ -2,6 +2,8 @@ package com.game.maths
 
 class Tile(var x: Int, var y: Int) {
 
+    fun copy(): Tile = Tile(x, y)
+
     fun offset(xAmount: Int, yAmount: Int): Tile = Tile(x + xAmount, y + yAmount)
 
     fun offset(direction: Direction): Tile = offset(direction.x, direction.y)
@@ -22,5 +24,19 @@ class Tile(var x: Int, var y: Int) {
         x = newX
         y = newY
         return this
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if(other is Tile) {
+            return x == other.x && y == other.y
+        }
+
+        return super.equals(other)
+    }
+
+    override fun hashCode(): Int {
+        var result = x
+        result = 31 * result + y
+        return result
     }
 }
