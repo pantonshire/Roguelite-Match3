@@ -66,7 +66,7 @@ class RoomState: State() {
                     lastEntity = currentEntity
                 }
 
-                if(currentEntity.isFinished()) {
+                if(currentEntity.isFinished() || currentEntity.dead) {
                     turnQueue.removeAt(0)
                     currentEntity.endTurn()
                     delay = maxOf(delay, currentEntity.actionDelay())
@@ -123,6 +123,7 @@ class RoomState: State() {
             }
 
             particles.add(AnimatedParticle(entity.drawPos(), Vector(), "explosion", Sequences.explosion))
+            entity.endIdle()
             entity.dead = true
             entity.onDied()
         }
@@ -201,7 +202,8 @@ class RoomState: State() {
 
                     if(chain.size >= 3) {
                         killSet.addAll(chain)
-                        delay = 20
+//                        chain.asSequence().forEach { it.endIdle() }
+//                        delay = 20
                     }
                 }
             }

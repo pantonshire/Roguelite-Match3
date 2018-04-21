@@ -225,7 +225,7 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
 
 
     fun stun() {
-        room.particles.add(TextParticle(drawPos(), Vector(y = 1.5), 60, "STUNNED", "orangekid", 12, Color.WHITE))
+        room.particles.add(TextParticle(drawPos(), Vector(y = 0.5), 60, "STUNNED", "orangekid", 12, Color.WHITE))
         stunned = true
         attackDirection = null
         path.clear()
