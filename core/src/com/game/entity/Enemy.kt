@@ -2,6 +2,7 @@ package com.game.entity
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.game.graphics.GameCanvas
 import com.game.graphics.Textures
@@ -14,8 +15,12 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
 
     override val sprite: TextureRegion = TextureRegion(Textures.get("skeleton"))
 
+    val maxMoves = 3
+
     val pathFinder = PathFinder(room)
-    var path: MutableList<Direction> = mutableListOf()
+    var path: MutableList<Tile> = mutableListOf()
+    var directions: MutableList<Direction> = mutableListOf()
+    val futurePos: Tile = pos.copy()
 
     var stunned = false
     var movesLeft: Int = 0
@@ -23,8 +28,9 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
 
 
     override fun act(): Boolean {
-        if(path.isNotEmpty()) {
-            move(path.first())
+        if(directions.isNotEmpty()) {
+            move(directions.first())
+            directions.removeAt(0)
             path.removeAt(0)
             --movesLeft
             return true
@@ -33,26 +39,42 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
         return false
     }
 
+
     override fun startTurn() {
-        movesLeft = 3
-        path = pathFinder.getDirectionSequence(pos, room.player.pos, group)
+        movesLeft = maxMoves
     }
+
 
     override fun endTurn() {
         path.clear()
+        directions.clear()
         stunned = false
     }
+
 
     override fun onDied() {
 
     }
 
+
     override fun isFinished(): Boolean {
         return path.isEmpty() || movesLeft == 0
     }
 
+
     override fun draw(canvas: GameCanvas) {
+        if(!path.isEmpty()) {
+            val pathTexture = Textures.get("enemy_path")
+            canvas.tint(Color(1.0f, 1.0f, 1.0f, 0.25f))
+            canvas.draw(pathTexture, (pos.x * tiles.tileSize + tiles.tileSize / 2).toFloat(), (pos.y * tiles.tileSize + tiles.tileSize / 2).toFloat())
+            path.asSequence().forEach {
+                canvas.draw(pathTexture, (it.x * tiles.tileSize + tiles.tileSize / 2).toFloat(), (it.y * tiles.tileSize + tiles.tileSize / 2).toFloat())
+            }
+            canvas.removeTint()
+        }
+
         super.draw(canvas)
+
         if(attackDirection != null) {
 
             val arrow = Textures.get("arrow")
@@ -69,16 +91,32 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
         }
     }
 
+
     fun chooseIntentions() {
         val player = room.player
 
+        path = pathFinder.findPath(pos, player.pos, group)
+        if(path.size > maxMoves) {
+            path = path.subList(0, maxMoves)
+        }
+
+        directions = pathFinder.toDirectionSequence(path)
+
+
+        if(path.isEmpty()) {
+            futurePos.set(pos.x, pos.y)
+        } else {
+            futurePos.set(path.last().x, path.last().y)
+        }
+
         attackDirection = when {
             stunned -> null
-            player.pos.x == pos.x && player.pos.y < pos.y -> Direction.SOUTH
-            player.pos.x == pos.x && player.pos.y > pos.y -> Direction.NORTH
-            player.pos.x < pos.x && player.pos.y == pos.y -> Direction.WEST
-            player.pos.x > pos.x && player.pos.y == pos.y -> Direction.EAST
+            player.pos.x == futurePos.x && player.pos.y < futurePos.y -> Direction.SOUTH
+            player.pos.x == futurePos.x && player.pos.y > futurePos.y -> Direction.NORTH
+            player.pos.x < futurePos.x && player.pos.y == futurePos.y -> Direction.WEST
+            player.pos.x > futurePos.x && player.pos.y == futurePos.y -> Direction.EAST
             else -> null
         }
     }
+
 }

@@ -87,6 +87,7 @@ class RoomState: State() {
 
     private fun newRound() {
         ++round
+        delay = 40
         turnQueue = entities.sortedWith(compareBy({ -it.currentSpeed() })).toMutableList()
         lastEntity = null
         chooseEnemyIntentions()
@@ -117,7 +118,14 @@ class RoomState: State() {
         }
 
         entities.asSequence().forEach {
-            if(it !in ignore && it.pos.x == tile.x && it.pos.y == tile.y) {
+            var entityX = it.pos.x
+            var entityY = it.pos.y
+            if(futurePositions && it is Enemy) {
+                entityX = it.futurePos.x
+                entityY = it.futurePos.y
+            }
+
+            if(it !in ignore && entityX == tile.x && entityY == tile.y) {
                 return false
             }
         }
@@ -126,9 +134,16 @@ class RoomState: State() {
     }
 
 
-    fun entityAt(tile: Tile, vararg ignore: Entity): Entity? {
+    fun entityAt(tile: Tile, futurePositions: Boolean = false, vararg ignore: Entity): Entity? {
         entities.asSequence().forEach {
-            if(it !in ignore && it.pos.x == tile.x && it.pos.y == tile.y) {
+            var entityX = it.pos.x
+            var entityY = it.pos.y
+            if(futurePositions && it is Enemy) {
+                entityX = it.futurePos.x
+                entityY = it.futurePos.y
+            }
+
+            if(it !in ignore && entityX == tile.x && entityY == tile.y) {
                 return it
             }
         }

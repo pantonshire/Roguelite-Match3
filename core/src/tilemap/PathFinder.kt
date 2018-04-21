@@ -13,13 +13,12 @@ class PathFinder(val room: RoomState) {
     var avoidGroup: String = "none"
 
 
-    fun getDirectionSequence(start: Tile, destination: Tile, avoidGroup: String): MutableList<Direction> {
-        val pointPath = findPath(start, destination, avoidGroup)
+    fun toDirectionSequence(path: MutableList<Tile>): MutableList<Direction> {
         val directionPath: MutableList<Direction> = mutableListOf()
 
         var currentPos: Tile = start
 
-        pointPath.asSequence().forEach {
+        path.asSequence().forEach {
             directionPath += when {
                 currentPos.x < it.x -> Direction.EAST
                 currentPos.x > it.x -> Direction.WEST
@@ -71,7 +70,7 @@ class PathFinder(val room: RoomState) {
                     neighbourIsDestination = true
                 }
 
-                if(room.isEmpty(it.pos)) {
+                if(room.isEmpty(it.pos, true)) {
                     if(it !in open) {
                         open += it
                     }
@@ -152,7 +151,7 @@ class PathFinder(val room: RoomState) {
 
         val neighbours = getNeighbours(node)
         neighbours.asSequence().forEach {
-            val neighbourEntity = room.entityAt(it.pos)
+            val neighbourEntity = room.entityAt(it.pos, true)
             if(neighbourEntity is Enemy) {
                 if(neighbourEntity.group == avoidGroup) {
                     ++consecutiveEnemies
@@ -165,7 +164,7 @@ class PathFinder(val room: RoomState) {
                         else -> Direction.NORTH
                     }
 
-                    val chainEntity = room.entityAt(it.pos.offset(direction))
+                    val chainEntity = room.entityAt(it.pos.offset(direction), true)
                     if(chainEntity is Enemy) {
                         if(chainEntity.group == avoidGroup) {
                             ++chainedEnemies
