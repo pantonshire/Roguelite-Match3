@@ -11,14 +11,18 @@ import java.awt.Point
 abstract class Entity(val room: RoomState, val pos: Tile, private val speed: Double) {
 
     val tiles = room.tiles
+    val lastPos = pos.copy()
+    var lastDirection: Direction = Direction.NORTH
 
     abstract val sprite: TextureRegion
 
     var dead: Boolean = false
+    var idleTicks: Int = 0
 
 
     fun move(direction: Direction): Boolean {
-        val lastPos = pos.copy()
+        lastPos.set(pos.x, pos.y)
+        lastDirection = direction
         val newPos = pos.offset(direction)
         if(!room.isEmpty(newPos)) {
             return false
@@ -31,13 +35,28 @@ abstract class Entity(val room: RoomState, val pos: Tile, private val speed: Dou
     }
 
     fun forceMove(direction: Direction) {
-        val lastPos = pos.copy()
+        lastPos.set(pos.x, pos.y)
+        lastDirection = direction
         pos.add(direction)
         room.checkForMatch()
         onMoved(lastPos)
     }
 
-    open fun drawPos(): Vector = tiles.getPositionOf(pos)
+    fun endIdle() {
+        idleTicks = 0
+        lastPos.set(pos.x, pos.y)
+    }
+
+    open fun drawPos(): Vector {
+        return if(pos != lastPos) {
+            tiles.getPositionOf(lastPos) +
+                    (Vector(lastDirection.x.toDouble(), lastDirection.y.toDouble())
+                            * (idleTicks * tiles.tileSize.toDouble() / actionDelay().toDouble())) +
+                    Vector(0.0, Math.sin(Math.PI * idleTicks.toDouble() / actionDelay().toDouble()) * 5.0)
+        } else {
+            tiles.getPositionOf(pos)
+        }
+    }
 
     open fun currentSpeed(): Double = speed
 

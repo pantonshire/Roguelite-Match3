@@ -53,6 +53,7 @@ class RoomState: State() {
                     lastEntity = currentEntity
                 }
 
+                currentEntity.endIdle()
                 if(currentEntity.act()) {
                     delay = maxOf(delay, currentEntity.actionDelay())
                 }
@@ -66,6 +67,9 @@ class RoomState: State() {
             }
         } else {
             --delay
+            if(turnQueue.isNotEmpty()) {
+                turnQueue.first().idleTicks += 1
+            }
         }
     }
 

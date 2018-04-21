@@ -22,6 +22,7 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
     var directions: MutableList<Direction> = mutableListOf()
     val futurePos: Tile = pos.copy()
     var pathLocked = false
+    var walking = false
 
     var stunned = false
     var movesLeft: Int = 0
@@ -36,12 +37,15 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
                 path.clear()
                 movesLeft = 0
                 attack()
+                walking = false
             } else {
+                walking = true
                 directions.removeAt(0)
                 path.removeAt(0)
                 --movesLeft
                 if(movesLeft == 0) {
                     attack()
+                    walking = false
                 }
             }
             return true
@@ -55,6 +59,9 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
                 bone!!.act()
                 return true
             }
+        } else {
+            attack()
+            return true
         }
 
         return false
@@ -120,6 +127,8 @@ class Enemy(room: RoomState, pos: Tile, val group: String): Entity(room, pos, 9.
             bone!!.draw(canvas)
         }
 
+
+        sprite.setRegion(0, 0, 24, 24)
         super.draw(canvas)
 
         if(attackDirection != null) {

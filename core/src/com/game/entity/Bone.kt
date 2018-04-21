@@ -59,6 +59,10 @@ class Bone(room: RoomState, pos: Tile, val direction: Direction): Entity(room, p
         return collided || movesLeft == 0
     }
 
+    override fun actionDelay(): Int {
+        return 5
+    }
+
     override fun draw(canvas: GameCanvas) {
         sprite.setRegion(if(horizontal) 15 else 0, 0, 15, 15)
         super.draw(canvas)
@@ -71,7 +75,7 @@ class Bone(room: RoomState, pos: Tile, val direction: Direction): Entity(room, p
         }
 
         val offset: Vector = Vector(direction.x.toDouble() * waitingTicks, direction.y.toDouble() * waitingTicks)
-        offset *= tiles.tileSize.toDouble() / 5.0
+        offset *= tiles.tileSize.toDouble() / actionDelay().toDouble()
         return super.drawPos() + offset
     }
 }
