@@ -36,24 +36,6 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
 
     init {
         entities.add(player)
-
-//        for(i in 0 until tiles.width) {
-//            for(j in 0..1) {
-//                tiles.tiles[i][j] = 5
-//                tiles.tiles[i][tiles.height - 1 - j] = 5
-//            }
-//        }
-//
-//        for(i in 0 until tiles.height) {
-//            for(j in 0..7) {
-//                tiles.tiles[j][i] = 5
-//                tiles.tiles[tiles.width - 1 - j][i] = 5
-//            }
-//        }
-//        entities.add(BlueWisp(this, Tile(10, 2), 0))
-//        entities.add(BlueWisp(this, Tile(11, 3), 1))
-//        entities.add(BlueWisp(this, Tile(12, 2), 2))
-//        entities.add(BlueWisp(this, Tile(13, 2), 3))
     }
 
 
@@ -128,6 +110,7 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
                     openDoors()
                 }
 
+                checkExitRoom()
                 player.endIdle()
                 if(player.act()) {
                     delay = maxOf(delay, player.actionDelay())
@@ -262,6 +245,21 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
 
 
     private fun isPlayerTurn(): Boolean = !turnQueue.isEmpty() && turnQueue.first() is Player
+
+
+    private fun checkExitRoom() {
+        val exitDirection: Direction? = when {
+            player.pos.x < 10 -> Direction.WEST
+            player.pos.x > 21 -> Direction.EAST
+            player.pos.y < 4 -> Direction.SOUTH
+            player.pos.y > 15 -> Direction.NORTH
+            else -> null
+        }
+
+        if(exitDirection != null) {
+            Run.current.travel(exitDirection)
+        }
+    }
 
 
     fun isEmpty(tile: Tile, futurePositions: Boolean = false, vararg ignore: Entity): Boolean {

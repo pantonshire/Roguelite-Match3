@@ -8,12 +8,12 @@ import tilemap.TileMap
 import java.util.*
 
 class RoomData(val difficulty: Int,
-               val north: Boolean, val east: Boolean, val south: Boolean, val west: Boolean,
+               var north: Boolean, var east: Boolean, var south: Boolean, var west: Boolean,
                val objects: Array<Pair<Char, Tile>>) {
 
     val tiles: TileMap = TileMap(32, 20, 24, "tiles", 5)
     val enemyMap: Array<String> = newEnemyMap()
-    var cleared: Boolean = false //TODO: SET TO TRUE WHEN CLEARED / EXITED ROOM
+    var cleared: Boolean = false
 
     init {
         for(i in 0 until tiles.width) {
@@ -35,7 +35,7 @@ class RoomData(val difficulty: Int,
     fun makeRoom(enteredFrom: Direction): RoomState {
 
         val playerPos = when(enteredFrom.opposite()) {
-            Direction.NORTH -> Tile(15, 19)
+            Direction.NORTH -> Tile(15, 15)
             Direction.SOUTH -> Tile(15, 4)
             Direction.EAST -> Tile(21, 10)
             else -> Tile(10, 10)

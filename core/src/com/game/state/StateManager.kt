@@ -5,6 +5,7 @@ import com.game.graphics.GameCanvas
 import com.game.graphics.Textures
 import com.game.maths.Direction
 import com.game.maths.Tile
+import com.game.run.Run
 
 object StateManager {
 
@@ -24,8 +25,7 @@ object StateManager {
 
         layers[0].setCameraPosition(384f, 240f)
 
-        current = RoomData(0, true, true, false, false,
-                RoomTemplates.combatRoom(0)).makeRoom(Direction.WEST)
+        current = Run.current.firstRoom().makeRoom(Direction.NORTH)
     }
 
     fun tick() {
@@ -51,5 +51,9 @@ object StateManager {
     }
 
     fun getCanvas(id: Int): GameCanvas = layers[id]
+
+    fun queueRoom(newRoom: RoomData, cameFrom: Direction) {
+        queued = newRoom.makeRoom(cameFrom)
+    }
 
 }

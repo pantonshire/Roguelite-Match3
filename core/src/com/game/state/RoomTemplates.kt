@@ -5,6 +5,14 @@ import com.game.maths.Tile
 
 object RoomTemplates {
 
+    fun startRoom(): Array<Pair<Char, Tile>> = arrayOf()
+
+    fun bossRoom(difficulty: Int): Array<Pair<Char, Tile>> = arrayOf()
+
+    fun exitRoom(): Array<Pair<Char, Tile>> = arrayOf()
+
+    fun treasureRoom(difficulty: Int): Array<Pair<Char, Tile>> = arrayOf()
+
     fun combatRoom(difficulty: Int): Array<Pair<Char, Tile>> = when(RandomUtils.randRange((3 * difficulty)..(4 + 3 * difficulty))) {
 
         0 -> arrayOf(
@@ -26,6 +34,7 @@ object RoomTemplates {
         )
 
         2 -> arrayOf(
+                Pair(   'w',    Tile(3, 7)     ),
                 Pair(   'w',    Tile(4, 7)     ),
                 Pair(   'w',    Tile(5, 7)     ),
                 Pair(   'w',    Tile(6, 7)     ),
