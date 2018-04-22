@@ -12,4 +12,6 @@ object RandomUtils {
 
     fun flipCoin(): Boolean = rng.nextBoolean()
 
+    fun randRange(range: IntRange): Int = rng.nextInt(range.endInclusive - range.start + 1) + range.start
+
 }
