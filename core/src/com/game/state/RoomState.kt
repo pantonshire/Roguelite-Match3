@@ -57,12 +57,18 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
         }
 
         if(delay <= 0) {
-            while (killSet.isNotEmpty()) {
+            var removedEntities = false
+            while(killSet.isNotEmpty()) {
+                removedEntities = true
                 killSet.asSequence().forEach {
                     killEntity(it)
                 }
                 killSet.clear()
                 checkGroups()
+            }
+
+            if(removedEntities) {
+                SFX.play("boom")
             }
 
             if(combat()) {
@@ -238,7 +244,6 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
             entity.endIdle()
             entity.dead = true
             entity.onDied()
-            SFX.play("boom")
         }
     }
 
