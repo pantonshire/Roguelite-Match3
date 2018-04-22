@@ -24,8 +24,8 @@ class Run {
 
     var maxHealth: Int      = 3
     var health: Int         = 3
-    var movements: Int      = 800
-    var attacks: Int        = 200
+    var movements: Int      = 8
+    var attacks: Int        = 2
 
     fun firstRoom(): RoomData = floor[0][0]!!
 

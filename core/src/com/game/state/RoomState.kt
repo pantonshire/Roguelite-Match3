@@ -7,10 +7,7 @@ import com.game.entity.*
 import com.game.graphics.GameCanvas
 import com.game.graphics.Sequences
 import com.game.graphics.Textures
-import com.game.maths.Direction
-import com.game.maths.RandomUtils
-import com.game.maths.Tile
-import com.game.maths.Vector
+import com.game.maths.*
 import com.game.particle.AnimatedParticle
 import com.game.particle.Particle
 import com.game.particle.TextParticle
@@ -131,6 +128,13 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
 
     override fun drawGame(canvas: GameCanvas) {
         tiles.draw(canvas)
+
+        if(!doorsLocked) {
+            if(north) { canvas.draw(Textures.get("exit_arrow"), 384f, 396f, rotation = Angle(0.0)) }
+            if(south) { canvas.draw(Textures.get("exit_arrow"), 384f, 84f, rotation = Angle(Math.PI)) }
+            if(east) { canvas.draw(Textures.get("exit_arrow"), 540f, 240f, rotation = Angle(Math.PI / -2.0)) }
+            if(west) { canvas.draw(Textures.get("exit_arrow"), 228f, 240f, rotation = Angle(Math.PI / 2.0)) }
+        }
 
         entities.asSequence().filter { it !is Enemy || enemyPathToShow == -1 || it.id == enemyPathToShow }.forEach { it.drawBG(canvas) }
         entities.asSequence().forEach { it.draw(canvas) }
