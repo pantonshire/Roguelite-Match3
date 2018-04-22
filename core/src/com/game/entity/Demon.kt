@@ -1,6 +1,7 @@
 package com.game.entity
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.game.audio.SFX
 import com.game.graphics.GameCanvas
 import com.game.graphics.Textures
 import com.game.maths.*
@@ -169,6 +170,7 @@ class Demon(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 9.5, "demon",
     private fun attack() {
         if(attackDirection != null) {
             fireball = DemonFireball(room, pos.copy(), attackDirection ?: Direction.NORTH)
+            SFX.play("shoot")
         }
     }
 

@@ -1,6 +1,7 @@
 package com.game.entity
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.game.audio.SFX
 import com.game.graphics.Animation
 import com.game.graphics.GameCanvas
 import com.game.graphics.Sequences
@@ -178,6 +179,7 @@ class Vampire(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 7.0, "vampi
                 } else if(target is Enemy) {
                     target.stun()
                 }
+                SFX.play("slash")
             }
         }
     }

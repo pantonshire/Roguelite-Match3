@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.game.audio.SFX
 import com.game.entity.*
 import com.game.graphics.GameCanvas
 import com.game.graphics.Sequences
@@ -237,6 +238,7 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
             entity.endIdle()
             entity.dead = true
             entity.onDied()
+            SFX.play("boom")
         }
     }
 
@@ -372,6 +374,7 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
 
 
     fun damagePlayer() {
+        SFX.play("boom")
         Run.current.loseHeart()
         particles.add(AnimatedParticle(player.drawPos(), Vector(), "hurt", Sequences.smallExplosion))
         if(Run.current.health <= 0) {

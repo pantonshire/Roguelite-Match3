@@ -1,6 +1,7 @@
 package com.game.entity
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.game.audio.SFX
 import com.game.graphics.GameCanvas
 import com.game.graphics.Textures
 import com.game.maths.*
@@ -147,10 +148,12 @@ class BlueWisp(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 4.25, "wis
         if(attacksLeft == 1) {
             if(attackDirectionA != null) {
                 fireball = BlueFireball(room, pos.copy(), attackDirectionA ?: Direction.NORTH)
+                SFX.play("shoot")
             }
         } else {
             if(attackDirectionB != null) {
                 fireball = BlueFireball(room, pos.copy(), attackDirectionB ?: Direction.NORTH)
+                SFX.play("shoot")
             }
         }
     }

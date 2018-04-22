@@ -1,6 +1,7 @@
 package com.game.entity
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.game.audio.SFX
 import com.game.graphics.GameCanvas
 import com.game.graphics.Textures
 import com.game.maths.*
@@ -164,6 +165,7 @@ class BlackSkeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 5.0, 
     private fun attack() {
         if(attackDirection != null) {
             bone = Bone(room, pos.copy(), attackDirection ?: Direction.NORTH)
+            SFX.play("slash")
         }
     }
 

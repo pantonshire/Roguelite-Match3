@@ -88,8 +88,6 @@ class Slime(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 1.0, "slime",
             val drawPos = drawPos() + Vector(0.0, -5.0) + Vector().setAngle(angle, 14.0)
             canvas.draw(arrow, drawPos.xf(), drawPos.yf(), rotation = angle)
         }
-
-//        canvas.draw(Textures.get("wisp"), (futurePos.x * tiles.tileSize).toFloat() + tiles.tileSize.toFloat() / 2f, futurePos.y * (tiles.tileSize).toFloat() + tiles.tileSize.toFloat() / 2f)
     }
 
 }

@@ -89,10 +89,10 @@ class RoomData(val difficulty: Int,
                     "skeleton",
                     "skeleton",
                     "gold_skeleton",
-                    "slime",
-                    "slime",
+                    "wisp",
                     "vampire",
                     "vampire",
+                    "dark_knight",
                     "dark_knight"
             )
 

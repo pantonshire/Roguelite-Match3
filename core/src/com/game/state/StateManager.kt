@@ -1,5 +1,6 @@
 package com.game.state
 
+import com.game.audio.SFX
 import com.game.graphics.Fonts
 import com.game.graphics.GameCanvas
 import com.game.graphics.Textures
@@ -25,6 +26,12 @@ object StateManager {
 
         layers[0].setCameraPosition(384f, 240f)
 
+        SFX.load("boom")
+        SFX.load("boop")
+        SFX.load("shoot")
+        SFX.load("slash")
+        SFX.load("step")
+
         current = MainMenu()
     }
 
@@ -48,6 +55,7 @@ object StateManager {
         layers.asSequence().forEach { it.dispose() }
         Textures.dispose()
         Fonts.dispose()
+        SFX.dispose()
     }
 
     fun getCanvas(id: Int): GameCanvas = layers[id]

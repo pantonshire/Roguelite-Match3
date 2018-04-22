@@ -1,6 +1,7 @@
 package com.game.entity
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.game.audio.SFX
 import com.game.graphics.GameCanvas
 import com.game.graphics.Textures
 import com.game.maths.*
@@ -179,6 +180,7 @@ class Necromancer(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 8.0, "n
     private fun attack() {
         if(attackDirection != null) {
             fireball = GreenFireball(room, pos.copy(), attackDirection ?: Direction.NORTH)
+            SFX.play("shoot")
         }
     }
 

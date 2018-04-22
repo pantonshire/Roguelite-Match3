@@ -1,6 +1,7 @@
 package com.game.entity
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.game.audio.SFX
 import com.game.graphics.GameCanvas
 import com.game.graphics.Textures
 import com.game.maths.*
@@ -136,6 +137,7 @@ class Wisp(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 4.5, "wisp", i
 
     private fun attack() {
         fireball = Fireball(room, pos.copy(), Direction.values()[attacksLeft % 4])
+        SFX.play("shoot")
     }
 
 }

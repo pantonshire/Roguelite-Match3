@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.game.audio.SFX
 import com.game.graphics.GameCanvas
 import com.game.graphics.Textures
 import com.game.maths.Direction
@@ -24,6 +25,7 @@ class MainMenu: State() {
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             when(option) {
                 0 -> {
+                    SFX.play("boop")
                     Run.newRun()
                     StateManager.queueRoom(Run.current.firstRoom(), Direction.NORTH)
                 }
@@ -35,6 +37,7 @@ class MainMenu: State() {
         }
 
         else if(Gdx.input.isKeyJustPressed(Input.Keys.UP) || Gdx.input.isKeyJustPressed(Input.Keys.W)) {
+            SFX.play("boop")
             --option
             if(option < 0) {
                 option = options.size - 1
@@ -42,6 +45,7 @@ class MainMenu: State() {
         }
 
         else if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN) || Gdx.input.isKeyJustPressed(Input.Keys.S)) {
+            SFX.play("boop")
             ++option
             if(option >= options.size) {
                 option = 0

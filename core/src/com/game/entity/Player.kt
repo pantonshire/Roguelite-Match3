@@ -3,6 +3,7 @@ package com.game.entity
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.game.audio.SFX
 import com.game.graphics.Sequences
 import com.game.graphics.Textures
 import com.game.maths.Direction
@@ -36,6 +37,7 @@ class Player(room: RoomState, pos: Tile): Entity(room, pos, 10.0) {
                                     (Gdx.input.isKeyJustPressed(Input.Keys.D) && move(Direction.EAST))
                             )) {
                 --movesLeft
+                SFX.play("step")
                 return true
             }
 
@@ -56,6 +58,7 @@ class Player(room: RoomState, pos: Tile): Entity(room, pos, 10.0) {
                         target.move(attackDirection)
                         target.knockback()
                         --attacksLeft
+                        SFX.play("slash")
                         return true
                     }
                 }
@@ -67,6 +70,7 @@ class Player(room: RoomState, pos: Tile): Entity(room, pos, 10.0) {
                     (Gdx.input.isKeyJustPressed(Input.Keys.S) && move(Direction.SOUTH)) ||
                     (Gdx.input.isKeyJustPressed(Input.Keys.D) && move(Direction.EAST))
             ) {
+                SFX.play("step")
                 return true
             }
         }
