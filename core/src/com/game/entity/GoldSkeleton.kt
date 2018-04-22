@@ -6,11 +6,11 @@ import com.game.graphics.Textures
 import com.game.maths.*
 import com.game.state.RoomState
 
-class Skeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, "skeleton", id) {
+class GoldSkeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, "skeleton", id) {
 
-    override val sprite: TextureRegion = TextureRegion(Textures.get("skeleton"))
+    override val sprite: TextureRegion = TextureRegion(Textures.get("gold_skeleton"))
     override val bounceHeight: Double = 5.0
-    override val maxMoves: Int = 3
+    override val maxMoves: Int = 6
 
     var attackDirection: Direction? = null
     var bone: Bone? = null
@@ -109,9 +109,15 @@ class Skeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, "skeleton"
         }
 
         if(attackDirection != null) {
-            attacksLeft = 1
+            attacksLeft = 2
         }
 
+    }
+
+
+    override fun endTurn() {
+        super.endTurn()
+        attackDirection = null
     }
 
 
@@ -129,12 +135,6 @@ class Skeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, "skeleton"
     }
 
 
-    override fun endTurn() {
-        super.endTurn()
-        attackDirection = null
-    }
-
-
     override fun idle() {
         super.idle()
         if(bone != null) {
@@ -148,7 +148,6 @@ class Skeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, "skeleton"
             bone!!.draw(canvas)
         }
 
-        sprite.setRegion(0, 0, 24, 24)
         super.draw(canvas)
     }
 

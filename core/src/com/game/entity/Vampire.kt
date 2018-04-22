@@ -1,19 +1,35 @@
 package com.game.entity
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.game.graphics.Animation
 import com.game.graphics.GameCanvas
+import com.game.graphics.Sequences
 import com.game.graphics.Textures
 import com.game.maths.*
 import com.game.state.RoomState
 
-class Skeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, "skeleton", id) {
+class Vampire(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, "vampire", id) {
 
-    override val sprite: TextureRegion = TextureRegion(Textures.get("skeleton"))
-    override val bounceHeight: Double = 5.0
-    override val maxMoves: Int = 3
+    override val sprite: TextureRegion = TextureRegion(Textures.get("vampire"))
+    override val bounceHeight: Double
+        get() = if(willFly) 0.0 else 5.0
+    override val maxMoves: Int
+        get() = if(willFly) 15 else 2
+
+    val batAnimation: Animation = Animation(Textures.get("bat"), Sequences.bat)
 
     var attackDirection: Direction? = null
-    var bone: Bone? = null
+    var willFly = false
+    var bat = false
+
+
+    override fun startTurn() {
+        super.startTurn()
+        if(willFly) {
+            bat = true
+        }
+    }
+
 
     override fun act(): Boolean {
         if(directions.isNotEmpty()) {
@@ -32,16 +48,6 @@ class Skeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, "skeleton"
             }
             return true
 
-        } else if(bone != null) {
-            if(bone!!.isFinished()) {
-                bone = null
-            }
-
-            else {
-                bone!!.endIdle()
-                bone!!.act()
-                return true
-            }
         } else {
             if(attack) {
                 attack()
@@ -54,8 +60,6 @@ class Skeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, "skeleton"
 
             return true
         }
-
-        return true
     }
 
 
@@ -63,6 +67,8 @@ class Skeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, "skeleton"
         if(stunned) {
             return
         }
+
+        willFly = RandomUtils.chance(0.3)
 
         val player = room.player
 
@@ -116,40 +122,26 @@ class Skeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, "skeleton"
 
 
     override fun isFinished(): Boolean {
-        return (path.isEmpty() || movesLeft == 0) && bone == null && attacksLeft == 0
-    }
-
-
-    override fun actionDelay(): Int {
-        if(bone != null) {
-            return bone!!.actionDelay()
-        }
-
-        return super.actionDelay()
+        return (path.isEmpty() || movesLeft == 0) && attacksLeft == 0
     }
 
 
     override fun endTurn() {
         super.endTurn()
         attackDirection = null
-    }
-
-
-    override fun idle() {
-        super.idle()
-        if(bone != null) {
-            bone!!.idle()
-        }
+        bat = false
+        willFly = false
     }
 
 
     override fun draw(canvas: GameCanvas) {
-        if(bone != null) {
-            bone!!.draw(canvas)
+        if(bat) {
+            batAnimation.updateAnimation()
+            val drawPos = drawPos()
+            batAnimation.draw(canvas, drawPos.xf(), drawPos.yf())
+        } else {
+            super.draw(canvas)
         }
-
-        sprite.setRegion(0, 0, 24, 24)
-        super.draw(canvas)
     }
 
 
@@ -173,7 +165,7 @@ class Skeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, "skeleton"
 
     private fun attack() {
         if(attackDirection != null) {
-            bone = Bone(room, pos.copy(), attackDirection ?: Direction.NORTH)
+            //TODO: Attack
         }
     }
 

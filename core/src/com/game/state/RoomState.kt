@@ -29,10 +29,10 @@ class RoomState: State() {
 
     init {
         entities.add(player)
-        entities.add(Wisp(this, Tile(10, 2), 0))
-        entities.add(Wisp(this, Tile(11, 3), 1))
-        entities.add(Wisp(this, Tile(12, 2), 2))
-        entities.add(Wisp(this, Tile(13, 2), 3))
+        entities.add(Vampire(this, Tile(10, 2), 0))
+        entities.add(Vampire(this, Tile(11, 3), 1))
+        entities.add(Vampire(this, Tile(12, 2), 2))
+        entities.add(Vampire(this, Tile(13, 2), 3))
     }
 
 

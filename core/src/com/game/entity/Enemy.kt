@@ -41,6 +41,7 @@ abstract class Enemy(room: RoomState, pos: Tile, val group: String, val id: Int)
         directions.clear()
         stunned = false
         pathLocked = false
+        attack = false
         attacksLeft = 0
     }
 
@@ -82,6 +83,7 @@ abstract class Enemy(room: RoomState, pos: Tile, val group: String, val id: Int)
         room.particles.add(TextParticle(drawPos(), Vector(y = 0.5), 60, "STUNNED", "orangekid", 12, Color.WHITE))
         stunned = true
         attacksLeft = 0
+        attack = false
         path.clear()
         directions.clear()
     }
