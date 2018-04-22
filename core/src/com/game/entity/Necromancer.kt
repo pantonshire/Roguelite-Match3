@@ -141,9 +141,10 @@ class Necromancer(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 8.0, "n
 
     override fun onDied() {
         super.onDied()
-        val skeleton = BlackSkeleton(room, pos.copy(), id)
+        val skeleton = Skeleton(room, pos.copy(), id)
         skeleton.invincible = true
         room.entities.add(skeleton)
+        room.newRound()
     }
 
 

@@ -15,8 +15,6 @@ class RoomData(val difficulty: Int,
     val enemyMap: Array<String> = newEnemyMap()
     var cleared: Boolean = false
 
-    val ladder: Tile = Tile(-1, -1)
-
     init {
         for(i in 0 until tiles.width) {
             for(j in 0..3) {
@@ -46,7 +44,7 @@ class RoomData(val difficulty: Int,
         val room = RoomState(playerPos, north, east, south, west, tiles)
 
         if(boss) {
-            room.ladderPos.set(13, 19)
+            room.ladderPos.set(20, 14)
         }
 
         var enemies = 0

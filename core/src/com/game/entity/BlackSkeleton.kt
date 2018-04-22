@@ -129,6 +129,7 @@ class BlackSkeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 5.0, 
         val skeleton = Skeleton(room, pos.copy(), id)
         skeleton.invincible = true
         room.entities.add(skeleton)
+        room.newRound()
     }
 
 

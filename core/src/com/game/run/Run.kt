@@ -26,8 +26,8 @@ class Run {
 
     var maxHealth: Int      = 3
     var health: Int         = 3
-    var movements: Int      = 800
-    var attacks: Int        = 200
+    var movements: Int      = 8
+    var attacks: Int        = 2
 
     fun firstRoom(): RoomData = floor[0][0]!!
 
@@ -48,6 +48,7 @@ class Run {
         if(difficulty < 2) {
             ++difficulty
             floor = generateFloor()
+            currentRoomPos.set(0, 0)
             currentRoom = firstRoom()
             StateManager.queueRoom(currentRoom, Direction.NORTH)
         } else {

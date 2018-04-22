@@ -143,10 +143,9 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
             if(south) { canvas.draw(Textures.get("exit_arrow"), 384f, 84f, rotation = Angle(Math.PI)) }
             if(east) { canvas.draw(Textures.get("exit_arrow"), 540f, 240f, rotation = Angle(Math.PI / -2.0)) }
             if(west) { canvas.draw(Textures.get("exit_arrow"), 228f, 240f, rotation = Angle(Math.PI / 2.0)) }
-        }
-
-        if(!combat() && ladderPos.x != -1 && ladderPos.y != -1) {
-            canvas.drawTile(ladderTexture, ladderPos.x * 24, ladderPos.y * 24)
+            if(ladderPos.x != -1 && ladderPos.y != -1) {
+                canvas.drawTile(ladderTexture, ladderPos.x * 24, ladderPos.y * 24)
+            }
         }
 
         entities.asSequence().filter { it !is Enemy || enemyPathToShow == -1 || it.id == enemyPathToShow }.forEach { it.drawBG(canvas) }
@@ -218,7 +217,7 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
     }
 
 
-    private fun newRound() {
+    fun newRound() {
         ++round
         delay = 40
         enemyPathToShow = -1
@@ -345,7 +344,7 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
                     for(distance in 1..10) {
                         val nextEntity = entityAt(rootPos.offset(it, distance))
                         if(nextEntity is Enemy) {
-                            if(nextEntity.group == rootEntity.group) {
+                            if(nextEntity.group == rootEntity.group && !nextEntity.invincible) {
                                 chain += nextEntity
                             } else {
                                 break

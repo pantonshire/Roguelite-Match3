@@ -145,6 +145,7 @@ class WhiteKnight(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 2.0, "w
         val knight = DarkKnight(room, pos.copy(), id)
         knight.invincible = true
         room.entities.add(knight)
+        room.newRound()
     }
 
 

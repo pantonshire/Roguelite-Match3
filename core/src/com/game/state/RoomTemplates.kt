@@ -48,7 +48,7 @@ object RoomTemplates {
 
     fun treasureRoom(difficulty: Int): Array<Pair<Char, Tile>> = arrayOf()
 
-    fun combatRoom(difficulty: Int): Array<Pair<Char, Tile>> = when(RandomUtils.randRange((3 * difficulty)..(4 + 3 * difficulty))) {
+    fun combatRoom(difficulty: Int): Array<Pair<Char, Tile>> = when(RandomUtils.randRange(0..7)) {
 
         0 -> arrayOf(
                 Pair(   'w',    Tile(3, 3)     ),
