@@ -17,12 +17,11 @@ import com.game.particle.TextParticle
 import com.game.run.Run
 import tilemap.TileMap
 
-class RoomState: State() {
+class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val south: Boolean, val west: Boolean, val tiles: TileMap = TileMap(32, 20, 24, "tiles", 5)): State() {
 
-    val tiles: TileMap = TileMap(32, 20, 24, "tiles", 5)
     val particles: MutableList<Particle> = mutableListOf()
     val entities: MutableList<Entity> = mutableListOf()
-    val player: Player = Player(this, Tile(14, 14))
+    val player: Player = Player(this, playerPos)
 
     var turnQueue: MutableList<Entity> = mutableListOf()
     val killSet: MutableSet<Entity> = mutableSetOf()
@@ -31,28 +30,29 @@ class RoomState: State() {
     var lastEntity: Entity? = null
     var gameOver: Boolean = false
     var gameOverTicks: Int = 0
+    var doorsLocked = false
 
 
     init {
-        for(i in 0 until tiles.width) {
-            for(j in 0..1) {
-                tiles.tiles[i][j] = 5
-                tiles.tiles[i][tiles.height - 1 - j] = 5
-            }
-        }
-
-        for(i in 0 until tiles.height) {
-            for(j in 0..7) {
-                tiles.tiles[j][i] = 5
-                tiles.tiles[tiles.width - 1 - j][i] = 5
-            }
-        }
-
         entities.add(player)
-        entities.add(BlueWisp(this, Tile(10, 2), 0))
-        entities.add(BlueWisp(this, Tile(11, 3), 1))
-        entities.add(BlueWisp(this, Tile(12, 2), 2))
-        entities.add(BlueWisp(this, Tile(13, 2), 3))
+
+//        for(i in 0 until tiles.width) {
+//            for(j in 0..1) {
+//                tiles.tiles[i][j] = 5
+//                tiles.tiles[i][tiles.height - 1 - j] = 5
+//            }
+//        }
+//
+//        for(i in 0 until tiles.height) {
+//            for(j in 0..7) {
+//                tiles.tiles[j][i] = 5
+//                tiles.tiles[tiles.width - 1 - j][i] = 5
+//            }
+//        }
+//        entities.add(BlueWisp(this, Tile(10, 2), 0))
+//        entities.add(BlueWisp(this, Tile(11, 3), 1))
+//        entities.add(BlueWisp(this, Tile(12, 2), 2))
+//        entities.add(BlueWisp(this, Tile(13, 2), 3))
     }
 
 
@@ -110,6 +110,11 @@ class RoomState: State() {
                     delay = maxOf(delay, currentEntity.actionDelay())
                 }
             } else {
+                if(doorsLocked) {
+                    doorsLocked = false
+                    openDoors()
+                }
+
                 player.endIdle()
                 if(player.act()) {
                     delay = maxOf(delay, player.actionDelay())
@@ -336,5 +341,45 @@ class RoomState: State() {
 
 
     fun combat(): Boolean = entities.size > 1
+
+
+    fun openDoors() {
+        if(north) {
+            tiles.tiles[15][18] = 1
+            tiles.tiles[16][18] = 1
+        }
+        if(south) {
+            tiles.tiles[15][1] = 1
+            tiles.tiles[16][1] = 1
+        }
+        if(east) {
+            tiles.tiles[24][9] = 1
+            tiles.tiles[24][10] = 1
+        }
+        if(west) {
+            tiles.tiles[7][9] = 1
+            tiles.tiles[7][10] = 1
+        }
+    }
+
+
+    fun closeDoors() {
+        if(north) {
+            tiles.tiles[15][18] = 6
+            tiles.tiles[16][18] = 6
+        }
+        if(south) {
+            tiles.tiles[15][1] = 6
+            tiles.tiles[16][1] = 6
+        }
+        if(east) {
+            tiles.tiles[24][9] = 7
+            tiles.tiles[24][10] = 7
+        }
+        if(west) {
+            tiles.tiles[7][9] = 7
+            tiles.tiles[7][10] = 7
+        }
+    }
 
 }

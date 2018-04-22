@@ -1,9 +1,9 @@
 package com.game.state
 
-import com.badlogic.gdx.graphics.Color
 import com.game.graphics.Fonts
 import com.game.graphics.GameCanvas
 import com.game.graphics.Textures
+import com.game.maths.Direction
 
 object StateManager {
 
@@ -23,7 +23,7 @@ object StateManager {
 
         layers[0].setCameraPosition(384f, 240f)
 
-        current = RoomState()
+        current = RoomData(0, true, true, false, false, arrayOf()).makeRoom(Direction.WEST)
     }
 
     fun tick() {

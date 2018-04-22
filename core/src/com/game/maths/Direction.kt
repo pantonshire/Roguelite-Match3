@@ -13,4 +13,11 @@ enum class Direction(val x: Int, val y: Int) {
         SOUTH -> Const.TAU * 0.5
         else -> Const.TAU * 0.75
     })
+
+    fun opposite(): Direction = when(this) {
+        NORTH -> SOUTH
+        SOUTH -> NORTH
+        EAST -> WEST
+        else -> EAST
+    }
 }
