@@ -3,6 +3,7 @@ package com.game.run
 import com.game.maths.Direction
 import com.game.maths.RandomUtils
 import com.game.maths.Tile
+import com.game.state.EndScreen
 import com.game.state.RoomData
 import com.game.state.RoomTemplates
 import com.game.state.StateManager
@@ -25,8 +26,8 @@ class Run {
 
     var maxHealth: Int      = 3
     var health: Int         = 3
-    var movements: Int      = 8
-    var attacks: Int        = 2
+    var movements: Int      = 800
+    var attacks: Int        = 200
 
     fun firstRoom(): RoomData = floor[0][0]!!
 
@@ -44,10 +45,14 @@ class Run {
     }
 
     fun nextFloor() {
-        ++difficulty
-        floor = generateFloor()
-        currentRoom = firstRoom()
-        StateManager.queueRoom(currentRoom, Direction.NORTH)
+        if(difficulty < 2) {
+            ++difficulty
+            floor = generateFloor()
+            currentRoom = firstRoom()
+            StateManager.queueRoom(currentRoom, Direction.NORTH)
+        } else {
+            StateManager.queue(EndScreen())
+        }
     }
 
     fun loseHeart() {

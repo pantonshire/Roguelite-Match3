@@ -86,7 +86,22 @@ class Necromancer(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 8.0, "n
             player.pos.x == futurePos.x && player.pos.y > futurePos.y -> Direction.NORTH
             player.pos.x < futurePos.x && player.pos.y == futurePos.y -> Direction.WEST
             player.pos.x > futurePos.x && player.pos.y == futurePos.y -> Direction.EAST
-            else -> null
+            else -> {
+                val horizontal = RandomUtils.flipCoin()
+                if(horizontal) {
+                    if(player.pos.x < futurePos.x) {
+                        Direction.WEST
+                    } else {
+                        Direction.EAST
+                    }
+                } else {
+                    if(player.pos.y < futurePos.y) {
+                        Direction.SOUTH
+                    } else {
+                        Direction.NORTH
+                    }
+                }
+            }
         }
 
         if(attackDirection != null) {

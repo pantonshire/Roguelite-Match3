@@ -64,6 +64,7 @@ class RoomData(val difficulty: Int,
 
                 it.first == 'b' && !cleared -> {
                     makeBoss(room, it.second, enemies)
+                    room.entities.add(makeBoss(room, it.second, enemies))
                     ++enemies
                 }
 
@@ -142,7 +143,7 @@ class RoomData(val difficulty: Int,
     }
 
 
-    fun makeBoss(room: RoomState, pos: Tile, existingEnemies: Int): Enemy {
+    private fun makeBoss(room: RoomState, pos: Tile, existingEnemies: Int): Enemy {
         val spawnPos = pos.offset(10, 4)
         return when(difficulty) {
             1 -> Demon(room, spawnPos, existingEnemies)
@@ -152,7 +153,7 @@ class RoomData(val difficulty: Int,
     }
 
 
-    fun makeEnemy(room: RoomState, pos: Tile, group: Int, existingEnemies: Int): Enemy {
+    private fun makeEnemy(room: RoomState, pos: Tile, group: Int, existingEnemies: Int): Enemy {
         val name = enemyMap[group]
         val spawnPos = pos.offset(10, 4)
         return when(name) {

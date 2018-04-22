@@ -7,7 +7,42 @@ object RoomTemplates {
 
     fun startRoom(): Array<Pair<Char, Tile>> = arrayOf()
 
-    fun bossRoom(difficulty: Int): Array<Pair<Char, Tile>> = arrayOf()
+    fun bossRoom(difficulty: Int): Array<Pair<Char, Tile>> = when(difficulty) {
+
+        0 -> arrayOf(
+                Pair(   'w',    Tile(0, 0)     ),
+                Pair(   'w',    Tile(0, 11)     ),
+                Pair(   'w',    Tile(11, 0)     ),
+                Pair(   'w',    Tile(11, 11)     ),
+                Pair(   'b',    Tile(3, 3)     ),
+                Pair(   'b',    Tile(3, 8)     ),
+                Pair(   'b',    Tile(8, 3)     ),
+                Pair(   'b',    Tile(8, 8)     )
+        )
+
+        1 -> arrayOf(
+                Pair(   'b',    Tile(3, 3)     ),
+                Pair(   'b',    Tile(3, 8)     ),
+                Pair(   'b',    Tile(8, 3)     ),
+                Pair(   'b',    Tile(8, 8)     ),
+                Pair(   'b',    Tile(5, 3)     ),
+                Pair(   'b',    Tile(3, 5)     )
+        )
+
+        2 -> arrayOf(
+                Pair(   'b',    Tile(0, 0)     ),
+                Pair(   'b',    Tile(0, 11)     ),
+                Pair(   'b',    Tile(11, 0)     ),
+                Pair(   'b',    Tile(11, 11)     ),
+                Pair(   'b',    Tile(3, 3)     ),
+                Pair(   'b',    Tile(3, 8)     ),
+                Pair(   'b',    Tile(8, 3)     ),
+                Pair(   'b',    Tile(8, 8)     )
+        )
+
+        else -> arrayOf()
+
+    }
 
     fun exitRoom(): Array<Pair<Char, Tile>> = arrayOf()
 
