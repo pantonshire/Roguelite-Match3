@@ -116,6 +116,14 @@ class RoomState: State() {
         for(i in 0 until Run.current.maxHealth) {
             canvas.draw(Textures.get(if(i >= Run.current.health) "empty_heart" else "heart"), 20f * i + 340f, 580f)
         }
+
+        for(i in 0 until Run.current.movements) {
+            canvas.draw(Textures.get(if(i >= player.movesLeft) "empty_boot" else "boot"), 20f * i + 340f, 560f)
+        }
+
+        for(i in 0 until Run.current.attacks) {
+            canvas.draw(Textures.get(if(i >= player.attacksLeft) "empty_sword" else "sword"), 20f * i + 340f, 540f)
+        }
     }
 
 

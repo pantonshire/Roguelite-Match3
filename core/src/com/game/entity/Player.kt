@@ -15,7 +15,7 @@ class Player(room: RoomState, pos: Tile): Entity(room, pos, 10.0) {
     override val bounceHeight: Double = 5.0
 
     var movesLeft: Int = 0
-    var attacked: Boolean = false
+    var attacksLeft: Int = 0
     var endedEarly: Boolean = false
 
 
@@ -35,7 +35,7 @@ class Player(room: RoomState, pos: Tile): Entity(room, pos, 10.0) {
             return true
         }
 
-        if(!attacked) {
+        if(attacksLeft > 0) {
             val attackDirection: Direction? = when {
                 Gdx.input.isKeyJustPressed(Input.Keys.UP) -> Direction.NORTH
                 Gdx.input.isKeyJustPressed(Input.Keys.DOWN) -> Direction.SOUTH
@@ -49,7 +49,7 @@ class Player(room: RoomState, pos: Tile): Entity(room, pos, 10.0) {
                 if(target != null) {
                     target.move(attackDirection)
                     target.knockback()
-                    attacked = true
+                    --attacksLeft
                     return true
                 }
             }
@@ -60,7 +60,7 @@ class Player(room: RoomState, pos: Tile): Entity(room, pos, 10.0) {
 
     override fun startTurn() {
         movesLeft = Run.current.movements
-        attacked = false
+        attacksLeft = Run.current.attacks
         endedEarly = false
     }
 
@@ -73,6 +73,6 @@ class Player(room: RoomState, pos: Tile): Entity(room, pos, 10.0) {
     }
 
     override fun isFinished(): Boolean {
-        return (movesLeft == 0 && attacked) || endedEarly
+        return (movesLeft == 0 && attacksLeft == 0) || endedEarly
     }
 }

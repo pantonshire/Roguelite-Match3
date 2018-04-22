@@ -13,7 +13,8 @@ class Run {
 
     var maxHealth: Int      = 3
     var health: Int         = 3
-    var movements: Int      = 100
+    var movements: Int      = 5
+    var attacks: Int        = 2
 
     fun loseHeart() {
         --health
