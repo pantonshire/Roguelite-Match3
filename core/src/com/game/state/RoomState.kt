@@ -1,10 +1,7 @@
 package com.game.state
 
 import com.badlogic.gdx.graphics.Color
-import com.game.entity.Entity
-import com.game.entity.Player
-import com.game.entity.Enemy
-import com.game.entity.Skeleton
+import com.game.entity.*
 import com.game.graphics.GameCanvas
 import com.game.graphics.Sequences
 import com.game.graphics.Textures
@@ -32,10 +29,10 @@ class RoomState: State() {
 
     init {
         entities.add(player)
-        entities.add(Skeleton(this, Tile(10, 2), 0))
-        entities.add(Skeleton(this, Tile(11, 3), 1))
-        entities.add(Skeleton(this, Tile(12, 2), 2))
-        entities.add(Skeleton(this, Tile(13, 2), 3))
+        entities.add(Wisp(this, Tile(10, 2), 0))
+        entities.add(Wisp(this, Tile(11, 3), 1))
+        entities.add(Wisp(this, Tile(12, 2), 2))
+        entities.add(Wisp(this, Tile(13, 2), 3))
     }
 
 
@@ -51,7 +48,10 @@ class RoomState: State() {
                 killSet.asSequence().forEach {
                     killEntity(it)
                 }
+                killSet.clear()
             }
+
+            checkGroups()
 
             if(entities.isNotEmpty()) {
 
@@ -147,6 +147,28 @@ class RoomState: State() {
             entity.endIdle()
             entity.dead = true
             entity.onDied()
+        }
+    }
+
+
+    private fun checkGroups() {
+        entities.asSequence().forEach {
+            if(it is Enemy) {
+                val enemy: Enemy = it
+                val group = it.group
+                var others = 0
+                entities.asSequence().forEach {
+                    if(it != enemy && it is Enemy) {
+                        if(it.group == group) {
+                            ++others
+                        }
+                    }
+                }
+
+                if(others < 2) {
+                    entities.filter { it is Enemy && it.group == group }.forEach { killSet += it }
+                }
+            }
         }
     }
 

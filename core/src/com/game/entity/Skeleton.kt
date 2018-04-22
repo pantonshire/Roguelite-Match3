@@ -122,7 +122,7 @@ class Skeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, "skeleton"
 
     override fun actionDelay(): Int {
         if(bone != null) {
-            return 5
+            return bone!!.actionDelay()
         }
 
         return super.actionDelay()
