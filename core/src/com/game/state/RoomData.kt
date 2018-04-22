@@ -17,14 +17,14 @@ class RoomData(val difficulty: Int,
 
     init {
         for(i in 0 until tiles.width) {
-            for(j in 0..1) {
+            for(j in 0..3) {
                 tiles.tiles[i][j] = 5
                 tiles.tiles[i][tiles.height - 1 - j] = 5
             }
         }
 
         for(i in 0 until tiles.height) {
-            for(j in 0..7) {
+            for(j in 0..9) {
                 tiles.tiles[j][i] = 5
                 tiles.tiles[tiles.width - 1 - j][i] = 5
             }
@@ -35,10 +35,10 @@ class RoomData(val difficulty: Int,
     fun makeRoom(enteredFrom: Direction): RoomState {
 
         val playerPos = when(enteredFrom.opposite()) {
-            Direction.NORTH -> Tile(15, 17)
-            Direction.SOUTH -> Tile(15, 2)
-            Direction.EAST -> Tile(23, 10)
-            else -> Tile(8, 10)
+            Direction.NORTH -> Tile(15, 19)
+            Direction.SOUTH -> Tile(15, 4)
+            Direction.EAST -> Tile(21, 10)
+            else -> Tile(10, 10)
         }
 
         val room = RoomState(playerPos, north, east, south, west, tiles)
@@ -47,10 +47,10 @@ class RoomData(val difficulty: Int,
 
         objects.asSequence().forEach {
             when {
-                it.first == 'w' -> tiles.tiles[it.second.x + 8][it.second.y + 2] = 5
+                it.first == 'w' -> tiles.tiles[it.second.x + 10][it.second.y + 4] = 5
 
                 it.first.isDigit() -> {
-                    val group: Int = intValidOf(it.first)
+                    val group: Int = intValueOf(it.first)
                     val newEnemy: Enemy = makeEnemy(room, it.second, group, enemies)
                     room.entities.add(newEnemy)
                     ++enemies
@@ -131,30 +131,31 @@ class RoomData(val difficulty: Int,
 
     fun makeEnemy(room: RoomState, pos: Tile, group: Int, existingEnemies: Int): Enemy {
         val name = enemyMap[group]
+        val spawnPos = pos.offset(10, 4)
         return when(name) {
-            "skeleton" -> Skeleton(room, pos.copy(), existingEnemies)
-            "gold_skeleton" -> GoldSkeleton(room, pos.copy(), existingEnemies)
-            "black_skeleton" -> BlackSkeleton(room, pos.copy(), existingEnemies)
-            "slime" -> Slime(room, pos.copy(), existingEnemies)
-            "vampire" -> Vampire(room, pos.copy(), existingEnemies)
-            "dark_knight" -> DarkKnight(room, pos.copy(), existingEnemies)
+            "skeleton" -> Skeleton(room, spawnPos, existingEnemies)
+            "gold_skeleton" -> GoldSkeleton(room, spawnPos, existingEnemies)
+            "black_skeleton" -> BlackSkeleton(room, spawnPos, existingEnemies)
+            "slime" -> Slime(room, spawnPos, existingEnemies)
+            "vampire" -> Vampire(room, spawnPos, existingEnemies)
+            "dark_knight" -> DarkKnight(room, spawnPos, existingEnemies)
             "wisp" -> {
                 if(RandomUtils.chance(0.5)) {
-                    Wisp(room, pos.copy(), existingEnemies)
+                    Wisp(room, spawnPos, existingEnemies)
                 } else {
-                    BlueWisp(room, pos.copy(), existingEnemies)
+                    BlueWisp(room, spawnPos, existingEnemies)
                 }
             }
 
             else -> {
                 println("Invalid name: $name")
-                Skeleton(room, pos.copy(), existingEnemies)
+                Skeleton(room, spawnPos, existingEnemies)
             }
         }
     }
 
 
-    fun intValidOf(character: Char): Int = when(character) {
+    fun intValueOf(character: Char): Int = when(character) {
         '0' -> 0
         '1' -> 1
         '2' -> 2

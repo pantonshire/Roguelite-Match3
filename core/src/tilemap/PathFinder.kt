@@ -52,7 +52,7 @@ class PathFinder(val room: RoomState, val traveller: Entity) {
         var success = false
         var loops = 0
 
-        while(open.isNotEmpty() && loops < 1000) {
+        while(open.isNotEmpty() && loops < 2000) {
             current = getCheapestOpenNode(open) ?: break
 
             if(current.pos == this.destination) {

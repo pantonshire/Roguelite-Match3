@@ -31,6 +31,7 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
     var gameOver: Boolean = false
     var gameOverTicks: Int = 0
     var doorsLocked = false
+    var enemyPathToShow: Int = -1
 
 
     init {
@@ -86,6 +87,19 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
                     newRound()
                 }
 
+                if(isPlayerTurn() && Gdx.input.isKeyJustPressed(Input.Keys.TAB)) {
+                    var nextId = -1
+                    for(it in entities) {
+                        if(it is Enemy) {
+                            if(it.id > enemyPathToShow && (it.id < nextId || nextId == -1)) {
+                                nextId = it.id
+                            }
+                        }
+                    }
+
+                    enemyPathToShow = nextId
+                }
+
                 val currentEntity = turnQueue.first()
 
                 if(currentEntity.invincible) {
@@ -136,7 +150,7 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
     override fun drawGame(canvas: GameCanvas) {
         tiles.draw(canvas)
 
-        entities.asSequence().forEach { it.drawBG(canvas) }
+        entities.asSequence().filter { it !is Enemy || enemyPathToShow == -1 || it.id == enemyPathToShow }.forEach { it.drawBG(canvas) }
         entities.asSequence().forEach { it.draw(canvas) }
 
         particles.asSequence().forEach {
@@ -144,7 +158,7 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
         }
 
         if(isPlayerTurn()) {
-            entities.asSequence().forEach { it.drawFG(canvas) }
+            entities.asSequence().filter { it !is Enemy || enemyPathToShow == -1 || it.id == enemyPathToShow }.forEach { it.drawFG(canvas) }
 
             for(i in 1 until turnQueue.size) {
                 canvas.drawText(i.toString(),
@@ -171,17 +185,20 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
 
         if(combat()) {
             if(isPlayerTurn()) {
-                canvas.drawText("Q: End turn", 844f, 580f, "prstart", 8, Color.WHITE)
-                canvas.drawText("WASD: Move", 844f, 560f, "prstart", 8, Color.WHITE)
-                canvas.drawText("Arrow keys:", 844f, 540f, "prstart", 8, Color.WHITE)
-                canvas.drawText("Attack", 844f, 528f, "prstart", 8, Color.WHITE)
+                canvas.drawText("Q: End turn", 840f, 580f, "prstart", 8, Color.WHITE)
+                canvas.drawText("WASD: Move", 840f, 560f, "prstart", 8, Color.WHITE)
+                canvas.drawText("Arrow keys:", 838f, 540f, "prstart", 8, Color.WHITE)
+                canvas.drawText("Attack", 838f, 528f, "prstart", 8, Color.WHITE)
+                canvas.drawText("Tab: view", 838f, 508f, "prstart", 8, Color.WHITE)
+                canvas.drawText("a single", 838f, 496f, "prstart", 8, Color.WHITE)
+                canvas.drawText("enemy\'s path", 838f, 484f, "prstart", 8, Color.WHITE)
             } else {
-                canvas.drawText("Enemy\'s turn", 844f, 580f, "prstart", 8, Color.WHITE)
+                canvas.drawText("Enemy\'s turn", 838f, 580f, "prstart", 8, Color.WHITE)
             }
         } else {
-            canvas.drawText("Victory!", 844f, 580f, "prstart", 8, Color.WHITE)
-            canvas.drawText("Time to go to", 844f, 560f, "prstart", 8, Color.WHITE)
-            canvas.drawText("the next room", 844f, 540f, "prstart", 8, Color.WHITE)
+            canvas.drawText("Victory!", 838f, 580f, "prstart", 8, Color.WHITE)
+            canvas.drawText("Time to go to", 838f, 560f, "prstart", 8, Color.WHITE)
+            canvas.drawText("the next room", 838f, 540f, "prstart", 8, Color.WHITE)
         }
 
         if(gameOverTicks > 30) {
@@ -193,6 +210,7 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
     private fun newRound() {
         ++round
         delay = 40
+        enemyPathToShow = -1
         turnQueue = entities.sortedWith(compareBy({ -it.currentSpeed() })).toMutableList()
         lastEntity = null
         chooseEnemyIntentions()
@@ -345,40 +363,40 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
 
     fun openDoors() {
         if(north) {
-            tiles.tiles[15][18] = 1
-            tiles.tiles[16][18] = 1
+            tiles.tiles[15][16] = 1
+            tiles.tiles[16][16] = 1
         }
         if(south) {
-            tiles.tiles[15][1] = 1
-            tiles.tiles[16][1] = 1
+            tiles.tiles[15][3] = 1
+            tiles.tiles[16][3] = 1
         }
         if(east) {
-            tiles.tiles[24][9] = 1
-            tiles.tiles[24][10] = 1
+            tiles.tiles[22][9] = 1
+            tiles.tiles[22][10] = 1
         }
         if(west) {
-            tiles.tiles[7][9] = 1
-            tiles.tiles[7][10] = 1
+            tiles.tiles[9][9] = 1
+            tiles.tiles[9][10] = 1
         }
     }
 
 
     fun closeDoors() {
         if(north) {
-            tiles.tiles[15][18] = 6
-            tiles.tiles[16][18] = 6
+            tiles.tiles[15][16] = 6
+            tiles.tiles[16][16] = 6
         }
         if(south) {
-            tiles.tiles[15][1] = 6
-            tiles.tiles[16][1] = 6
+            tiles.tiles[15][3] = 6
+            tiles.tiles[16][3] = 6
         }
         if(east) {
-            tiles.tiles[24][9] = 7
-            tiles.tiles[24][10] = 7
+            tiles.tiles[22][9] = 7
+            tiles.tiles[22][10] = 7
         }
         if(west) {
-            tiles.tiles[7][9] = 7
-            tiles.tiles[7][10] = 7
+            tiles.tiles[9][9] = 7
+            tiles.tiles[9][10] = 7
         }
     }
 
