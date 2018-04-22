@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.game.entity.Entity
 import com.game.entity.Player
 import com.game.entity.Enemy
+import com.game.entity.Skeleton
 import com.game.graphics.GameCanvas
 import com.game.graphics.Sequences
 import com.game.graphics.Textures
@@ -31,10 +32,10 @@ class RoomState: State() {
 
     init {
         entities.add(player)
-        entities.add(Enemy(this, Tile(10, 2), "skeleton", 0))
-        entities.add(Enemy(this, Tile(11, 3), "skeleton", 1))
-        entities.add(Enemy(this, Tile(12, 2), "skeleton", 2))
-        entities.add(Enemy(this, Tile(13, 2), "skeleton", 3))
+        entities.add(Skeleton(this, Tile(10, 2), 0))
+        entities.add(Skeleton(this, Tile(11, 3), 1))
+        entities.add(Skeleton(this, Tile(12, 2), 2))
+        entities.add(Skeleton(this, Tile(13, 2), 3))
     }
 
 
@@ -65,18 +66,18 @@ class RoomState: State() {
                     lastEntity?.endIdle()
                     currentEntity.startTurn()
                     lastEntity = currentEntity
-                }
-
-                currentEntity.endIdle()
-                if(currentEntity.act()) {
-                    delay = maxOf(delay, currentEntity.actionDelay())
-                }
-
-                if(currentEntity.isFinished() || currentEntity.dead) {
+                } else if(currentEntity.isFinished() || currentEntity.dead) {
                     turnQueue.removeAt(0)
                     currentEntity.endTurn()
                     delay = maxOf(delay, currentEntity.actionDelay())
+                }
 
+                entities.asSequence().forEach {
+                    it.endIdle()
+                }
+
+                if(currentEntity.act()) {
+                    delay = maxOf(delay, currentEntity.actionDelay())
                 }
 
             }
@@ -230,6 +231,15 @@ class RoomState: State() {
                     }
                 }
             }
+        }
+    }
+
+
+    fun damagePlayer() {
+        Run.current.loseHeart()
+        particles.add(AnimatedParticle(player.drawPos(), Vector(), "hurt", Sequences.smallExplosion))
+        if(Run.current.health <= 0) {
+            //GAME OVER
         }
     }
 

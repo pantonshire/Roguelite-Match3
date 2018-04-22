@@ -7,4 +7,10 @@ enum class Direction(val x: Int, val y: Int) {
     SOUTH   (0, -1),
     WEST    (-1, 0);
 
+    fun angle(): Angle = Angle(when(this) {
+        NORTH -> 0.0
+        WEST -> Const.TAU * 0.25
+        SOUTH -> Const.TAU * 0.5
+        else -> Const.TAU * 0.75
+    })
 }

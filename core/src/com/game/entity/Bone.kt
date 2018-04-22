@@ -26,7 +26,7 @@ class Bone(room: RoomState, pos: Tile, val direction: Direction): Entity(room, p
             val hitEntity = room.entityAt(pos)
             if(hitEntity != null) {
                 if(hitEntity is Player) {
-                    Run.current.loseHeart()
+                    room.damagePlayer()
                 } else if(hitEntity is Enemy) {
                     hitEntity.stun()
                 }

@@ -3,9 +3,12 @@ package com.game.entity
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.game.graphics.Sequences
 import com.game.graphics.Textures
 import com.game.maths.Direction
 import com.game.maths.Tile
+import com.game.maths.Vector
+import com.game.particle.AnimatedParticle
 import com.game.run.Run
 import com.game.state.RoomState
 
@@ -47,6 +50,8 @@ class Player(room: RoomState, pos: Tile): Entity(room, pos, 10.0) {
             if(attackDirection != null) {
                 val target = room.entityAt(pos.offset(attackDirection))
                 if(target != null) {
+                    val angle = attackDirection.angle()
+                    room.particles.add(AnimatedParticle(drawPos() + Vector(0.0, 3.0) + Vector().setAngle(angle, 12.0), Vector(), "slash", Sequences.slash).setAngle(angle))
                     target.move(attackDirection)
                     target.knockback()
                     --attacksLeft
