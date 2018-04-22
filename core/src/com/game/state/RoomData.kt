@@ -9,11 +9,13 @@ import java.util.*
 
 class RoomData(val difficulty: Int,
                var north: Boolean, var east: Boolean, var south: Boolean, var west: Boolean,
-               val objects: Array<Pair<Char, Tile>>) {
+               val objects: Array<Pair<Char, Tile>>, val boss: Boolean = false) {
 
     val tiles: TileMap = TileMap(32, 20, 24, "tiles", 5)
     val enemyMap: Array<String> = newEnemyMap()
     var cleared: Boolean = false
+
+    val ladder: Tile = Tile(-1, -1)
 
     init {
         for(i in 0 until tiles.width) {
@@ -43,6 +45,10 @@ class RoomData(val difficulty: Int,
 
         val room = RoomState(playerPos, north, east, south, west, tiles)
 
+        if(boss) {
+            room.ladderPos.set(13, 19)
+        }
+
         var enemies = 0
 
         objects.asSequence().forEach {
@@ -53,6 +59,11 @@ class RoomData(val difficulty: Int,
                     val group: Int = intValueOf(it.first)
                     val newEnemy: Enemy = makeEnemy(room, it.second, group, enemies)
                     room.entities.add(newEnemy)
+                    ++enemies
+                }
+
+                it.first == 'b' && !cleared -> {
+                    makeBoss(room, it.second, enemies)
                     ++enemies
                 }
 
@@ -131,6 +142,16 @@ class RoomData(val difficulty: Int,
     }
 
 
+    fun makeBoss(room: RoomState, pos: Tile, existingEnemies: Int): Enemy {
+        val spawnPos = pos.offset(10, 4)
+        return when(difficulty) {
+            1 -> Demon(room, spawnPos, existingEnemies)
+            2 -> WhiteKnight(room, spawnPos, existingEnemies)
+            else -> Necromancer(room, spawnPos, existingEnemies)
+        }
+    }
+
+
     fun makeEnemy(room: RoomState, pos: Tile, group: Int, existingEnemies: Int): Enemy {
         val name = enemyMap[group]
         val spawnPos = pos.offset(10, 4)
@@ -148,6 +169,9 @@ class RoomData(val difficulty: Int,
                     BlueWisp(room, spawnPos, existingEnemies)
                 }
             }
+            "necromancer" -> Necromancer(room, spawnPos, existingEnemies)
+            "demon" -> Demon(room, spawnPos, existingEnemies)
+            "white_knight" -> WhiteKnight(room, spawnPos, existingEnemies)
 
             else -> {
                 println("Invalid name: $name")

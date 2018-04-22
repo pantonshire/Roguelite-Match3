@@ -13,16 +13,16 @@ import com.game.particle.AnimatedParticle
 import com.game.run.Run
 import com.game.state.RoomState
 
-class BlueFireball(room: RoomState, pos: Tile, val direction: Direction): Entity(room, pos, 0.0) {
+class GreenFireball(room: RoomState, pos: Tile, val direction: Direction): Entity(room, pos, 0.0) {
 
-    override val sprite: TextureRegion = TextureRegion(Textures.get("blue_fireball"))
+    override val sprite: TextureRegion = TextureRegion(Textures.get("green_fireball"))
     override val bounceHeight: Double = 0.0
 
-    var movesLeft: Int = 10
+    var movesLeft: Int = 6
     var collided: Boolean = false
 
     override fun act(): Boolean {
-        room.particles.add(AnimatedParticle(drawPos(), Vector(), "blue_explosion", Sequences.smallExplosion))
+        room.particles.add(AnimatedParticle(drawPos(), Vector(), "green_explosion", Sequences.smallExplosion))
 
         forceMove(direction)
         if(!room.isEmpty(pos)) {
@@ -31,8 +31,10 @@ class BlueFireball(room: RoomState, pos: Tile, val direction: Direction): Entity
                 if(hitEntity is Player) {
                     room.damagePlayer()
                 } else if(hitEntity is Enemy) {
-                    if(hitEntity.group != "wisp" && hitEntity.group != "demon") {
+                    if(hitEntity.group != "necromancer") {
                         hitEntity.stun()
+                        hitEntity.knockback()
+                        hitEntity.move(direction)
                     }
                 }
             }

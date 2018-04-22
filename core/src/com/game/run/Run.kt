@@ -19,6 +19,7 @@ class Run {
     }
 
     var floor: Array<Array<RoomData?>> = generateFloor()
+    var currentRoom: RoomData = firstRoom()
     val currentRoomPos: Tile = Tile(0, 0)
     var difficulty = 0
 
@@ -36,6 +37,7 @@ class Run {
             if(newRoom != null) {
                 floor[currentRoomPos.x][currentRoomPos.y]?.cleared = true
                 currentRoomPos.set(newPos.x, newPos.y)
+                currentRoom = newRoom
                 StateManager.queueRoom(newRoom, direction)
             }
         }
@@ -44,7 +46,8 @@ class Run {
     fun nextFloor() {
         ++difficulty
         floor = generateFloor()
-        StateManager.queueRoom(firstRoom(), Direction.NORTH)
+        currentRoom = firstRoom()
+        StateManager.queueRoom(currentRoom, Direction.NORTH)
     }
 
     fun loseHeart() {
@@ -126,7 +129,7 @@ class Run {
         }
 
         val vertical = RandomUtils.flipCoin()
-        val bossRoom = RoomData(difficulty, false, false, vertical, !vertical, RoomTemplates.bossRoom(difficulty))
+        val bossRoom = RoomData(difficulty, false, false, vertical, !vertical, RoomTemplates.bossRoom(difficulty), true)
         if(vertical) {
             newFloor[furthestRoom.x][furthestRoom.y + 1] = bossRoom
             newFloor[furthestRoom.x][furthestRoom.y]?.north = true

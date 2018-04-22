@@ -111,7 +111,7 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
                     openDoors()
                 }
 
-                if(ladderPos.x != -1 && ladderPos.y != -1 && ladderPos.x == player.pos.x && ladderPos.y == player.pos.y) {
+                if(ladderPos.x != -1 && ladderPos.y != -1 && ladderPos.x == player.pos.x && ladderPos.y == player.pos.y && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
                     Run.current.nextFloor()
                     return
                 }
@@ -145,7 +145,7 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
             if(west) { canvas.draw(Textures.get("exit_arrow"), 228f, 240f, rotation = Angle(Math.PI / 2.0)) }
         }
 
-        if(ladderPos.x != -1 && ladderPos.y != -1) {
+        if(!combat() && ladderPos.x != -1 && ladderPos.y != -1) {
             canvas.drawTile(ladderTexture, ladderPos.x * 24, ladderPos.y * 24)
         }
 
@@ -197,6 +197,10 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
                 canvas.drawText("Enemy\'s turn", 838f, 580f, "prstart", 8, Color.WHITE)
             }
         } else {
+            if(ladderPos.x != -1 && ladderPos.y != -1 && ladderPos.x == player.pos.x && ladderPos.y == player.pos.y) {
+                canvas.drawText("Space: Descend", 532f, 240f, "prstart", 16, Color.WHITE)
+            }
+
             if(!alreadyCleared) {
                 canvas.drawText("Victory!", 838f, 580f, "prstart", 8, Color.WHITE)
                 canvas.drawText("Time to go to", 838f, 568f, "prstart", 8, Color.WHITE)

@@ -25,7 +25,6 @@ object StateManager {
 
         layers[0].setCameraPosition(384f, 240f)
 
-//        current = Run.current.firstRoom().makeRoom(Direction.NORTH)
         current = MainMenu()
     }
 

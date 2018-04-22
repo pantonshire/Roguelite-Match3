@@ -31,7 +31,7 @@ class Fireball(room: RoomState, pos: Tile, val direction: Direction): Entity(roo
                 if(hitEntity is Player) {
                     room.damagePlayer()
                 } else if(hitEntity is Enemy) {
-                    if(hitEntity.group != "wisp") {
+                    if(hitEntity.group != "wisp" && hitEntity.group != "demon") {
                         hitEntity.stun()
                     }
                 }
