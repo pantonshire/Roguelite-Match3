@@ -81,7 +81,7 @@ abstract class Enemy(room: RoomState, pos: Tile, speed: Double, val group: Strin
 
 
     fun stun() {
-        room.particles.add(TextParticle(drawPos(), Vector(y = 0.5), 60, "STUNNED", "orangekid", 12, Color.WHITE))
+        room.particles.add(TextParticle(drawPos(), Vector(y = 0.5), 60, "STUNNED", "prstart", 8, Color.WHITE))
         stunned = true
         attacksLeft = 0
         attack = false

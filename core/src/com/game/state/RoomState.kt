@@ -145,7 +145,7 @@ class RoomState: State() {
                 canvas.drawText(i.toString(),
                         turnQueue[i].pos.x.toFloat() * tiles.tileSize + 2,
                         turnQueue[i].pos.y.toFloat() * tiles.tileSize + tiles.tileSize + 6,
-                        "orangekid", 12, Color.WHITE)
+                        "prstart", 8, Color.WHITE)
             }
         }
     }
@@ -164,8 +164,23 @@ class RoomState: State() {
             canvas.draw(Textures.get(if(i >= player.attacksLeft) "empty_sword" else "sword"), 380f, 580f - 20f * i)
         }
 
+        if(combat()) {
+            if(isPlayerTurn()) {
+                canvas.drawText("Q: End turn", 844f, 580f, "prstart", 8, Color.WHITE)
+                canvas.drawText("WASD: Move", 844f, 560f, "prstart", 8, Color.WHITE)
+                canvas.drawText("Arrow keys:", 844f, 540f, "prstart", 8, Color.WHITE)
+                canvas.drawText("Attack", 844f, 528f, "prstart", 8, Color.WHITE)
+            } else {
+                canvas.drawText("Enemy\'s turn", 844f, 580f, "prstart", 8, Color.WHITE)
+            }
+        } else {
+            canvas.drawText("Victory!", 844f, 580f, "prstart", 8, Color.WHITE)
+            canvas.drawText("Time to go to", 844f, 560f, "prstart", 8, Color.WHITE)
+            canvas.drawText("the next room", 844f, 540f, "prstart", 8, Color.WHITE)
+        }
+
         if(gameOverTicks > 30) {
-            canvas.drawText("GAME OVER (PRESS SPACE)", 538f, 580f, "november", 18, Color.WHITE)
+            canvas.drawText("GAME OVER (PRESS SPACE)", 460f, 420f, "prstart", 16, Color.WHITE)
         }
     }
 
@@ -305,7 +320,7 @@ class RoomState: State() {
         }
 
         if(foundMatch) {
-            particles.add(TextParticle(textPos, Vector(y = 0.25), 60, RandomUtils.randEncouragement(), "orangekid", 12, Color.WHITE).setTimer(10))
+            particles.add(TextParticle(textPos, Vector(y = 0.25), 60, RandomUtils.randEncouragement(), "prstart", 8, Color.WHITE).setTimer(10))
         }
     }
 
