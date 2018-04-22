@@ -35,8 +35,8 @@ class PathFinder(val room: RoomState) {
 
 
     fun findPath(start: Tile, destination: Tile, avoidGroup: String): MutableList<Tile> {
-        this.start = start
-        this.destination = destination
+        this.start = start.copy()
+        this.destination = destination.copy()
         this.avoidGroup = avoidGroup
         nodes = mutableMapOf()
 
@@ -44,7 +44,7 @@ class PathFinder(val room: RoomState) {
 
         val closed: MutableSet<Node> = mutableSetOf()
         val open: MutableSet<Node> = mutableSetOf()
-        val startNode: Node = getNode(start)
+        val startNode: Node = getNode(this.start)
         var current: Node = startNode
         open += startNode
 
@@ -54,7 +54,7 @@ class PathFinder(val room: RoomState) {
         while(open.isNotEmpty() && loops < 1000) {
             current = getCheapestOpenNode(open) ?: break
 
-            if(current.pos == destination) {
+            if(current.pos == this.destination) {
                 success = true
                 break
             }
@@ -66,7 +66,7 @@ class PathFinder(val room: RoomState) {
             var neighbourIsDestination = false
 
             neighbours.asSequence().filter { it !in closed }.forEach {
-                if(it.pos == destination) {
+                if(it.pos == this.destination) {
                     neighbourIsDestination = true
                 }
 

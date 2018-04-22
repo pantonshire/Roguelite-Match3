@@ -29,10 +29,10 @@ class RoomState: State() {
 
     init {
         entities.add(player)
-        entities.add(Vampire(this, Tile(10, 2), 0))
-        entities.add(Vampire(this, Tile(11, 3), 1))
-        entities.add(Vampire(this, Tile(12, 2), 2))
-        entities.add(Vampire(this, Tile(13, 2), 3))
+        entities.add(Slime(this, Tile(10, 2), 0))
+        entities.add(Slime(this, Tile(11, 3), 1))
+        entities.add(Slime(this, Tile(12, 2), 2))
+        entities.add(Slime(this, Tile(13, 2), 3))
     }
 
 
@@ -44,14 +44,13 @@ class RoomState: State() {
         particles.removeIf { it.shouldRemove() }
 
         if(delay <= 0) {
-            if(killSet.isNotEmpty()) {
+            while(killSet.isNotEmpty()) {
                 killSet.asSequence().forEach {
                     killEntity(it)
                 }
                 killSet.clear()
+                checkGroups()
             }
-
-            checkGroups()
 
             if(entities.isNotEmpty()) {
 
