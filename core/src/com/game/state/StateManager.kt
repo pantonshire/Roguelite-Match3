@@ -25,20 +25,7 @@ object StateManager {
         layers[0].setCameraPosition(384f, 240f)
 
         current = RoomData(0, true, true, false, false,
-                arrayOf(
-                        Pair(   'w',    Tile(5, 5)     ),
-                        Pair(   'w',    Tile(5, 6)     ),
-                        Pair(   'w',    Tile(6, 5)     ),
-                        Pair(   'w',    Tile(6, 6)     ),
-                        Pair(   '0',    Tile(4, 5)     ),
-                        Pair(   '0',    Tile(7, 5)     ),
-                        Pair(   '0',    Tile(5, 7)     ),
-                        Pair(   '1',    Tile(1, 1)     ),
-                        Pair(   '1',    Tile(1, 10)     ),
-                        Pair(   '1',    Tile(10,  1)     ),
-                        Pair(   '1',    Tile(10,  10)     )
-                )
-        ).makeRoom(Direction.WEST)
+                RoomTemplates.combatRoom(0)).makeRoom(Direction.WEST)
     }
 
     fun tick() {
