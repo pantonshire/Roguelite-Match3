@@ -13,7 +13,7 @@ class RoomData(val difficulty: Int,
 
     val tiles: TileMap = TileMap(32, 20, 24, "tiles", 5)
     val enemyMap: Array<String> = newEnemyMap()
-    var cleared: Boolean = false
+    var cleared: Boolean = false //TODO: SET TO TRUE WHEN CLEARED / EXITED ROOM
 
     init {
         for(i in 0 until tiles.width) {
@@ -49,7 +49,7 @@ class RoomData(val difficulty: Int,
             when {
                 it.first == 'w' -> tiles.tiles[it.second.x + 10][it.second.y + 4] = 5
 
-                it.first.isDigit() -> {
+                it.first.isDigit() && !cleared -> {
                     val group: Int = intValueOf(it.first)
                     val newEnemy: Enemy = makeEnemy(room, it.second, group, enemies)
                     room.entities.add(newEnemy)

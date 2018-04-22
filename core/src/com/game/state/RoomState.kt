@@ -125,7 +125,6 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
                 }
             } else {
                 if(doorsLocked) {
-                    doorsLocked = false
                     openDoors()
                 }
 
@@ -362,6 +361,7 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
 
 
     fun openDoors() {
+        doorsLocked = false
         if(north) {
             tiles.tiles[15][16] = 1
             tiles.tiles[16][16] = 1
@@ -382,6 +382,7 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
 
 
     fun closeDoors() {
+        doorsLocked = true
         if(north) {
             tiles.tiles[15][16] = 6
             tiles.tiles[16][16] = 6
