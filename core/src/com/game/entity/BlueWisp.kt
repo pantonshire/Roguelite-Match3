@@ -6,13 +6,15 @@ import com.game.graphics.Textures
 import com.game.maths.*
 import com.game.state.RoomState
 
-class Wisp(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 4.5, "wisp", id) {
+class BlueWisp(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 4.25, "wisp", id) {
 
-    override val sprite: TextureRegion = TextureRegion(Textures.get("wisp"))
+    override val sprite: TextureRegion = TextureRegion(Textures.get("blue_wisp"))
     override val bounceHeight: Double = 7.0
     override val maxMoves: Int = 1
 
-    var fireball: Fireball? = null
+    var attackDirectionA: Direction? = null
+    var attackDirectionB: Direction? = null
+    var fireball: BlueFireball? = null
 
     override fun act(): Boolean {
         if(directions.isNotEmpty()) {
@@ -79,8 +81,17 @@ class Wisp(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 4.5, "wisp", i
             futurePos.set(path.last().x, path.last().y)
         }
 
-        attacksLeft = 4
+        attackDirectionA = RandomUtils.randDirection()
+        attackDirectionB = RandomUtils.randDirection()
+        attacksLeft = 2
 
+    }
+
+
+    override fun endTurn() {
+        super.endTurn()
+        attackDirectionA = null
+        attackDirectionB = null
     }
 
 
@@ -111,31 +122,37 @@ class Wisp(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 4.5, "wisp", i
             fireball!!.draw(canvas)
         }
 
-        sprite.setRegion(0, 0, 24, 24)
         super.draw(canvas)
     }
 
 
     override fun drawFG(canvas: GameCanvas) {
-        for(i in 0 until minOf(Direction.values().size, attacksLeft)) {
-            val direction = Direction.values()[i]
+        if(attackDirectionA != null) {
             val arrow = Textures.get("arrow")
-            val angle = Angle(when(direction) {
-                Direction.NORTH -> 0.0
-                Direction.WEST -> Const.TAU * 0.25
-                Direction.SOUTH -> Const.TAU * 0.5
-                else -> Const.TAU * 0.75
-            })
-
+            val angle = attackDirectionA!!.angle()
             val drawPos = drawPos() + Vector().setAngle(angle, 12.0)
+            canvas.draw(arrow, drawPos.xf(), drawPos.yf(), rotation = angle)
+        }
 
+        if(attackDirectionB != null) {
+            val arrow = Textures.get("arrow")
+            val angle = attackDirectionB!!.angle()
+            val drawPos = drawPos() + Vector().setAngle(angle, 12.0)
             canvas.draw(arrow, drawPos.xf(), drawPos.yf(), rotation = angle)
         }
     }
 
 
     private fun attack() {
-        fireball = Fireball(room, pos.copy(), Direction.values()[attacksLeft % 4])
+        if(attacksLeft == 1) {
+            if(attackDirectionA != null) {
+                fireball = BlueFireball(room, pos.copy(), attackDirectionA ?: Direction.NORTH)
+            }
+        } else {
+            if(attackDirectionB != null) {
+                fireball = BlueFireball(room, pos.copy(), attackDirectionB ?: Direction.NORTH)
+            }
+        }
     }
 
 }

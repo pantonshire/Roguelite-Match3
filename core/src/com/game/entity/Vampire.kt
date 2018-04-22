@@ -9,7 +9,7 @@ import com.game.maths.*
 import com.game.particle.AnimatedParticle
 import com.game.state.RoomState
 
-class Vampire(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, "vampire", id) {
+class Vampire(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 7.0, "vampire", id) {
 
     override val sprite: TextureRegion = TextureRegion(Textures.get("vampire"))
     override val bounceHeight: Double
@@ -171,9 +171,9 @@ class Vampire(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, "vampire", 
             room.particles.add(AnimatedParticle(drawPos() + Vector(0.0, 3.0) + Vector().setAngle(angle, 12.0), Vector(), "slash", Sequences.slash).setAngle(angle))
             val target = room.entityAt(pos.offset(direction))
             if(target != null) {
-                target.move(direction)
-                target.knockback()
                 if(target is Player) {
+                    target.move(direction)
+                    target.knockback()
                     room.damagePlayer()
                 } else if(target is Enemy) {
                     target.stun()

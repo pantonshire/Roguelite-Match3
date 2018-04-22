@@ -14,11 +14,11 @@ import com.game.run.Run
 import com.game.state.RoomState
 import tilemap.PathFinder
 
-abstract class Enemy(room: RoomState, pos: Tile, val group: String, val id: Int): Entity(room, pos, 9.0) {
+abstract class Enemy(room: RoomState, pos: Tile, speed: Double, val group: String, val id: Int): Entity(room, pos, speed + (0.1 * id)) {
 
     abstract val maxMoves: Int
 
-    val pathFinder = PathFinder(room)
+    val pathFinder = PathFinder(room, this)
     var path: MutableList<Tile> = mutableListOf()
     var directions: MutableList<Direction> = mutableListOf()
     val futurePos: Tile = pos.copy()
@@ -43,6 +43,7 @@ abstract class Enemy(room: RoomState, pos: Tile, val group: String, val id: Int)
         pathLocked = false
         attack = false
         attacksLeft = 0
+        futurePos.set(pos.x, pos.y)
     }
 
 

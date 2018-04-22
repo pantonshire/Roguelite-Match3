@@ -6,7 +6,7 @@ import com.game.graphics.Textures
 import com.game.maths.*
 import com.game.state.RoomState
 
-class GoldSkeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, "skeleton", id) {
+class GoldSkeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 9.0, "skeleton", id) {
 
     override val sprite: TextureRegion = TextureRegion(Textures.get("gold_skeleton"))
     override val bounceHeight: Double = 5.0

@@ -1,38 +1,58 @@
 package com.game.state
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.game.entity.*
 import com.game.graphics.GameCanvas
 import com.game.graphics.Sequences
 import com.game.graphics.Textures
 import com.game.maths.Direction
+import com.game.maths.RandomUtils
 import com.game.maths.Tile
 import com.game.maths.Vector
 import com.game.particle.AnimatedParticle
 import com.game.particle.Particle
+import com.game.particle.TextParticle
 import com.game.run.Run
 import tilemap.TileMap
 
 class RoomState: State() {
 
-    val tiles: TileMap = TileMap(50, 50, 24, "tiles", 5)
+    val tiles: TileMap = TileMap(32, 20, 24, "tiles", 5)
     val particles: MutableList<Particle> = mutableListOf()
     val entities: MutableList<Entity> = mutableListOf()
-    val player: Player = Player(this, Tile(0, 0))
+    val player: Player = Player(this, Tile(14, 14))
 
     var turnQueue: MutableList<Entity> = mutableListOf()
     val killSet: MutableSet<Entity> = mutableSetOf()
     var round = 0
     var delay = 0
     var lastEntity: Entity? = null
+    var gameOver: Boolean = false
+    var gameOverTicks: Int = 0
 
 
     init {
+        for(i in 0 until tiles.width) {
+            for(j in 0..1) {
+                tiles.tiles[i][j] = 5
+                tiles.tiles[i][tiles.height - 1 - j] = 5
+            }
+        }
+
+        for(i in 0 until tiles.height) {
+            for(j in 0..7) {
+                tiles.tiles[j][i] = 5
+                tiles.tiles[tiles.width - 1 - j][i] = 5
+            }
+        }
+
         entities.add(player)
-        entities.add(Slime(this, Tile(10, 2), 0))
-        entities.add(Slime(this, Tile(11, 3), 1))
-        entities.add(Slime(this, Tile(12, 2), 2))
-        entities.add(Slime(this, Tile(13, 2), 3))
+        entities.add(BlueWisp(this, Tile(10, 2), 0))
+        entities.add(BlueWisp(this, Tile(11, 3), 1))
+        entities.add(BlueWisp(this, Tile(12, 2), 2))
+        entities.add(BlueWisp(this, Tile(13, 2), 3))
     }
 
 
@@ -43,8 +63,16 @@ class RoomState: State() {
 
         particles.removeIf { it.shouldRemove() }
 
+        if(gameOver) {
+            ++gameOverTicks
+            if(gameOverTicks > 30 && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+                //TODO: Return to main menu
+            }
+            return
+        }
+
         if(delay <= 0) {
-            while(killSet.isNotEmpty()) {
+            while (killSet.isNotEmpty()) {
                 killSet.asSequence().forEach {
                     killEntity(it)
                 }
@@ -52,14 +80,17 @@ class RoomState: State() {
                 checkGroups()
             }
 
-            if(entities.isNotEmpty()) {
-
+            if(combat()) {
                 if(turnQueue.isEmpty()) {
                     lastEntity?.endIdle()
                     newRound()
                 }
 
                 val currentEntity = turnQueue.first()
+
+                if(currentEntity.invincible) {
+                    currentEntity.invincible = false
+                }
 
                 if(lastEntity != currentEntity) {
                     lastEntity?.endIdle()
@@ -78,12 +109,20 @@ class RoomState: State() {
                 if(currentEntity.act()) {
                     delay = maxOf(delay, currentEntity.actionDelay())
                 }
-
+            } else {
+                player.endIdle()
+                if(player.act()) {
+                    delay = maxOf(delay, player.actionDelay())
+                }
             }
         } else {
             --delay
-            if(turnQueue.isNotEmpty()) {
-                turnQueue.first().idle()
+            if(combat()) {
+                if(turnQueue.isNotEmpty()) {
+                    turnQueue.first().idle()
+                }
+            } else {
+                player.idle()
             }
         }
     }
@@ -114,15 +153,19 @@ class RoomState: State() {
 
     override fun drawHUD(canvas: GameCanvas) {
         for(i in 0 until Run.current.maxHealth) {
-            canvas.draw(Textures.get(if(i >= Run.current.health) "empty_heart" else "heart"), 20f * i + 340f, 580f)
+            canvas.draw(Textures.get(if(i >= Run.current.health) "empty_heart" else "heart"),340f, 580f - 20f * i)
         }
 
         for(i in 0 until Run.current.movements) {
-            canvas.draw(Textures.get(if(i >= player.movesLeft) "empty_boot" else "boot"), 20f * i + 340f, 560f)
+            canvas.draw(Textures.get(if(i >= player.movesLeft) "empty_boot" else "boot"), 360f, 580f - 20f * i)
         }
 
         for(i in 0 until Run.current.attacks) {
-            canvas.draw(Textures.get(if(i >= player.attacksLeft) "empty_sword" else "sword"), 20f * i + 340f, 540f)
+            canvas.draw(Textures.get(if(i >= player.attacksLeft) "empty_sword" else "sword"), 380f, 580f - 20f * i)
+        }
+
+        if(gameOverTicks > 30) {
+            canvas.drawText("GAME OVER (PRESS SPACE)", 538f, 580f, "november", 18, Color.WHITE)
         }
     }
 
@@ -136,13 +179,13 @@ class RoomState: State() {
     }
 
     private fun killEntity(entity: Entity) {
-        if(!entity.dead) {
+        if(!entity.dead && !entity.invincible) {
             entities.remove(entity)
             if (entity in turnQueue) {
                 turnQueue.remove(entity)
             }
 
-            particles.add(AnimatedParticle(entity.drawPos(), Vector(), "explosion", Sequences.explosion))
+            particles.add(0, AnimatedParticle(entity.drawPos(), Vector(), "explosion", Sequences.explosion))
             entity.endIdle()
             entity.dead = true
             entity.onDied()
@@ -173,7 +216,7 @@ class RoomState: State() {
 
 
     private fun chooseEnemyIntentions() {
-        entities.asSequence().forEach {
+        turnQueue.asSequence().forEach {
             if(it is Enemy) {
                 it.chooseIntentions()
             }
@@ -225,6 +268,9 @@ class RoomState: State() {
 
 
     fun checkForMatch() {
+        var foundMatch = false
+        var textPos = Vector(0.0, 0.0)
+
         entities.asSequence().forEach {
             if(it is Enemy) {
                 val rootEntity = it
@@ -247,11 +293,19 @@ class RoomState: State() {
 
                     if(chain.size >= 3) {
                         killSet.addAll(chain)
+                        if(!foundMatch) {
+                            foundMatch = true
+                            textPos = chain.first().drawPos()
+                        }
 //                        chain.asSequence().forEach { it.endIdle() }
 //                        delay = 20
                     }
                 }
             }
+        }
+
+        if(foundMatch) {
+            particles.add(TextParticle(textPos, Vector(y = 0.25), 60, RandomUtils.randEncouragement(), "orangekid", 12, Color.WHITE).setTimer(10))
         }
     }
 
@@ -260,8 +314,12 @@ class RoomState: State() {
         Run.current.loseHeart()
         particles.add(AnimatedParticle(player.drawPos(), Vector(), "hurt", Sequences.smallExplosion))
         if(Run.current.health <= 0) {
-            //GAME OVER
+            gameOver = true
+            entities.remove(player)
         }
     }
+
+
+    fun combat(): Boolean = entities.size > 1
 
 }

@@ -6,5 +6,6 @@ object Sequences {
     val smallExplosion: AnimationSequence = AnimationSequence("explode_small", 24, 24, 5, 3, false)
     val slash: AnimationSequence = AnimationSequence("slash", 24, 24, 8, 2, false)
     val bat: AnimationSequence = AnimationSequence("bat", 24, 24, 2, 5, true)
+    val summon: AnimationSequence = AnimationSequence("summon", 24, 24, 12, 2, false)
 
 }

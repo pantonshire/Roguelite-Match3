@@ -13,6 +13,7 @@ abstract class Entity(val room: RoomState, val pos: Tile, private val speed: Dou
     val tiles = room.tiles
     val lastPos = pos.copy()
     var lastDirection: Direction = Direction.NORTH
+    var invincible = false
 
     abstract val sprite: TextureRegion
     abstract val bounceHeight: Double

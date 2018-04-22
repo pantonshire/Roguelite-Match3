@@ -23,40 +23,51 @@ class Player(room: RoomState, pos: Tile): Entity(room, pos, 10.0) {
 
 
     override fun act(): Boolean {
-        if(Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
-            endedEarly = true
-            return true
-        }
-
-        if(movesLeft > 0 && (
-                (Gdx.input.isKeyJustPressed(Input.Keys.W) && move(Direction.NORTH)) ||
-                (Gdx.input.isKeyJustPressed(Input.Keys.A) && move(Direction.WEST)) ||
-                (Gdx.input.isKeyJustPressed(Input.Keys.S) && move(Direction.SOUTH)) ||
-                (Gdx.input.isKeyJustPressed(Input.Keys.D) && move(Direction.EAST))
-        )) {
-            --movesLeft
-            return true
-        }
-
-        if(attacksLeft > 0) {
-            val attackDirection: Direction? = when {
-                Gdx.input.isKeyJustPressed(Input.Keys.UP) -> Direction.NORTH
-                Gdx.input.isKeyJustPressed(Input.Keys.DOWN) -> Direction.SOUTH
-                Gdx.input.isKeyJustPressed(Input.Keys.LEFT) -> Direction.WEST
-                Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) -> Direction.EAST
-                else -> null
+        if(room.combat()) {
+            if(Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
+                endedEarly = true
+                return true
             }
 
-            if(attackDirection != null) {
-                val target = room.entityAt(pos.offset(attackDirection))
-                if(target != null) {
-                    val angle = attackDirection.angle()
-                    room.particles.add(AnimatedParticle(drawPos() + Vector(0.0, 3.0) + Vector().setAngle(angle, 12.0), Vector(), "slash", Sequences.slash).setAngle(angle))
-                    target.move(attackDirection)
-                    target.knockback()
-                    --attacksLeft
-                    return true
+            if(movesLeft > 0 && (
+                            (Gdx.input.isKeyJustPressed(Input.Keys.W) && move(Direction.NORTH)) ||
+                                    (Gdx.input.isKeyJustPressed(Input.Keys.A) && move(Direction.WEST)) ||
+                                    (Gdx.input.isKeyJustPressed(Input.Keys.S) && move(Direction.SOUTH)) ||
+                                    (Gdx.input.isKeyJustPressed(Input.Keys.D) && move(Direction.EAST))
+                            )) {
+                --movesLeft
+                return true
+            }
+
+            if(attacksLeft > 0) {
+                val attackDirection: Direction? = when {
+                    Gdx.input.isKeyJustPressed(Input.Keys.UP) -> Direction.NORTH
+                    Gdx.input.isKeyJustPressed(Input.Keys.DOWN) -> Direction.SOUTH
+                    Gdx.input.isKeyJustPressed(Input.Keys.LEFT) -> Direction.WEST
+                    Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) -> Direction.EAST
+                    else -> null
                 }
+
+                if(attackDirection != null) {
+                    val target = room.entityAt(pos.offset(attackDirection))
+                    if (target != null) {
+                        val angle = attackDirection.angle()
+                        room.particles.add(AnimatedParticle(drawPos() + Vector(0.0, 3.0) + Vector().setAngle(angle, 12.0), Vector(), "slash", Sequences.slash).setAngle(angle))
+                        target.move(attackDirection)
+                        target.knockback()
+                        --attacksLeft
+                        return true
+                    }
+                }
+            }
+
+        } else {
+            if((Gdx.input.isKeyJustPressed(Input.Keys.W) && move(Direction.NORTH)) ||
+                    (Gdx.input.isKeyJustPressed(Input.Keys.A) && move(Direction.WEST)) ||
+                    (Gdx.input.isKeyJustPressed(Input.Keys.S) && move(Direction.SOUTH)) ||
+                    (Gdx.input.isKeyJustPressed(Input.Keys.D) && move(Direction.EAST))
+            ) {
+                return true
             }
         }
 

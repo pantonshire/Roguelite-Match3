@@ -6,9 +6,9 @@ import com.game.graphics.Textures
 import com.game.maths.*
 import com.game.state.RoomState
 
-class Skeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 5.0, "skeleton", id) {
+class BlackSkeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 5.0, "black_skeleton", id) {
 
-    override val sprite: TextureRegion = TextureRegion(Textures.get("skeleton"))
+    override val sprite: TextureRegion = TextureRegion(Textures.get("black_skeleton"))
     override val bounceHeight: Double = 5.0
     override val maxMoves: Int = 3
 
@@ -86,26 +86,7 @@ class Skeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 5.0, "skel
             player.pos.x == futurePos.x && player.pos.y > futurePos.y -> Direction.NORTH
             player.pos.x < futurePos.x && player.pos.y == futurePos.y -> Direction.WEST
             player.pos.x > futurePos.x && player.pos.y == futurePos.y -> Direction.EAST
-            else -> {
-                if(RandomUtils.chance(0.5)) {
-                    val horizontal = RandomUtils.flipCoin()
-                    if(horizontal) {
-                        if(player.pos.x < futurePos.x) {
-                            Direction.WEST
-                        } else {
-                            Direction.EAST
-                        }
-                    } else {
-                        if(player.pos.y < futurePos.y) {
-                            Direction.SOUTH
-                        } else {
-                            Direction.NORTH
-                        }
-                    }
-                } else {
-                    null
-                }
-            }
+            else -> null
         }
 
         if(attackDirection != null) {
@@ -140,6 +121,14 @@ class Skeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 5.0, "skel
         if(bone != null) {
             bone!!.idle()
         }
+    }
+
+
+    override fun onDied() {
+        super.onDied()
+        val skeleton = Skeleton(room, pos.copy(), id)
+        skeleton.invincible = true
+        room.entities.add(skeleton)
     }
 
 

@@ -3,6 +3,7 @@ package tilemap
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.game.graphics.GameCanvas
 import com.game.graphics.Textures
+import com.game.maths.RandomUtils
 import com.game.maths.Tile
 import com.game.maths.Vector
 
@@ -10,7 +11,10 @@ class TileMap(val width: Int, val height: Int, val tileSize: Int, tileSet: Strin
 
     val nullTile: Byte = 0.toByte()
 
-    val tiles: Array<Array<Byte>> = Array(width, { Array(height, { 1.toByte() }) })
+    val tiles: Array<Array<Byte>> = Array(width, { Array(height, {
+        if(RandomUtils.chance(0.75)) 1.toByte() else RandomUtils.randRange(2..4).toByte()
+    }) })
+
     val tileSet: TextureRegion = TextureRegion(Textures.get(tileSet))
     var lastDrawnTile: Byte = 0
 

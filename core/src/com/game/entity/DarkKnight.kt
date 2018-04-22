@@ -1,19 +1,24 @@
 package com.game.entity
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.game.graphics.Animation
 import com.game.graphics.GameCanvas
+import com.game.graphics.Sequences
 import com.game.graphics.Textures
 import com.game.maths.*
+import com.game.particle.AnimatedParticle
 import com.game.state.RoomState
 
-class Skeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 5.0, "skeleton", id) {
+class DarkKnight(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 2.0, "darkknight", id) {
 
-    override val sprite: TextureRegion = TextureRegion(Textures.get("skeleton"))
+    override val sprite: TextureRegion = TextureRegion(Textures.get("dark_knight"))
     override val bounceHeight: Double = 5.0
-    override val maxMoves: Int = 3
+    override val maxMoves: Int
+        get() = if(willCharge) 15 else 3
 
     var attackDirection: Direction? = null
-    var bone: Bone? = null
+    var willCharge = false
+
 
     override fun act(): Boolean {
         if(directions.isNotEmpty()) {
@@ -32,16 +37,6 @@ class Skeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 5.0, "skel
             }
             return true
 
-        } else if(bone != null) {
-            if(bone!!.isFinished()) {
-                bone = null
-            }
-
-            else {
-                bone!!.endIdle()
-                bone!!.act()
-                return true
-            }
         } else {
             if(attack) {
                 attack()
@@ -54,8 +49,6 @@ class Skeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 5.0, "skel
 
             return true
         }
-
-        return true
     }
 
 
@@ -66,13 +59,34 @@ class Skeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 5.0, "skel
 
         val player = room.player
 
+        val chargeDirection: Direction? = when {
+            player.pos.x == futurePos.x && player.pos.y < futurePos.y -> Direction.SOUTH
+            player.pos.x == futurePos.x && player.pos.y > futurePos.y -> Direction.NORTH
+            player.pos.x < futurePos.x && player.pos.y == futurePos.y -> Direction.WEST
+            player.pos.x > futurePos.x && player.pos.y == futurePos.y -> Direction.EAST
+            else -> null
+        }
+
+        if(chargeDirection != null) {
+            for(i in 1..15) {
+                val chargePos = pos.offset(chargeDirection, i)
+                if(chargePos == player.pos) {
+                    willCharge = true
+                    break
+                }
+
+                if(!room.isEmpty(chargePos, true, player)) {
+                    break
+                }
+            }
+        }
+
         path = pathFinder.findPath(pos, player.pos, group)
-        if(path.size > maxMoves) {
+        if (path.size > maxMoves) {
             path = path.subList(0, maxMoves)
         }
 
         directions = pathFinder.toDirectionSequence(path)
-
 
         if(path.isEmpty()) {
             futurePos.set(pos.x, pos.y)
@@ -81,7 +95,6 @@ class Skeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 5.0, "skel
         }
 
         attackDirection = when {
-            stunned -> null
             player.pos.x == futurePos.x && player.pos.y < futurePos.y -> Direction.SOUTH
             player.pos.x == futurePos.x && player.pos.y > futurePos.y -> Direction.NORTH
             player.pos.x < futurePos.x && player.pos.y == futurePos.y -> Direction.WEST
@@ -109,47 +122,21 @@ class Skeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 5.0, "skel
         }
 
         if(attackDirection != null) {
-            attacksLeft = 1
+            attacksLeft = 2
         }
 
     }
 
 
     override fun isFinished(): Boolean {
-        return (path.isEmpty() || movesLeft == 0) && bone == null && attacksLeft == 0
-    }
-
-
-    override fun actionDelay(): Int {
-        if(bone != null) {
-            return bone!!.actionDelay()
-        }
-
-        return super.actionDelay()
+        return (path.isEmpty() || movesLeft == 0) && attacksLeft == 0
     }
 
 
     override fun endTurn() {
         super.endTurn()
         attackDirection = null
-    }
-
-
-    override fun idle() {
-        super.idle()
-        if(bone != null) {
-            bone!!.idle()
-        }
-    }
-
-
-    override fun draw(canvas: GameCanvas) {
-        if(bone != null) {
-            bone!!.draw(canvas)
-        }
-
-        sprite.setRegion(0, 0, 24, 24)
-        super.draw(canvas)
+        willCharge = false
     }
 
 
@@ -173,7 +160,19 @@ class Skeleton(room: RoomState, pos: Tile, id: Int): Enemy(room, pos, 5.0, "skel
 
     private fun attack() {
         if(attackDirection != null) {
-            bone = Bone(room, pos.copy(), attackDirection ?: Direction.NORTH)
+            val direction = attackDirection!!
+            val angle = direction.angle()
+            room.particles.add(AnimatedParticle(drawPos() + Vector(0.0, 3.0) + Vector().setAngle(angle, 12.0), Vector(), "slash", Sequences.slash).setAngle(angle))
+            val target = room.entityAt(pos.offset(direction))
+            if(target != null) {
+                if(target is Player) {
+                    target.move(direction)
+                    target.knockback()
+                    room.damagePlayer()
+                } else if(target is Enemy) {
+                    target.stun()
+                }
+            }
         }
     }
 

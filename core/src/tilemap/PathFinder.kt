@@ -1,11 +1,12 @@
 package tilemap
 
 import com.game.entity.Enemy
+import com.game.entity.Entity
 import com.game.maths.Direction
 import com.game.maths.Tile
 import com.game.state.RoomState
 
-class PathFinder(val room: RoomState) {
+class PathFinder(val room: RoomState, val traveller: Entity) {
 
     var nodes: MutableMap<Tile, Node> = mutableMapOf()
     var start: Tile = Tile(0, 0)
@@ -153,21 +154,15 @@ class PathFinder(val room: RoomState) {
         neighbours.asSequence().forEach {
             val neighbourEntity = room.entityAt(it.pos, true)
             if(neighbourEntity is Enemy) {
-                if(neighbourEntity.group == avoidGroup) {
+                if(neighbourEntity.group == avoidGroup && neighbourEntity != traveller) {
                     ++consecutiveEnemies
 
-                    val direction = when {
-                        it.pos.x > node.pos.x -> Direction.EAST
-                        it.pos.x < node.pos.x -> Direction.WEST
-                        it.pos.y > node.pos.y -> Direction.NORTH
-                        it.pos.y < node.pos.y -> Direction.SOUTH
-                        else -> Direction.NORTH
-                    }
-
-                    val chainEntity = room.entityAt(it.pos.offset(direction), true)
-                    if(chainEntity is Enemy) {
-                        if(chainEntity.group == avoidGroup) {
-                            ++chainedEnemies
+                    getNeighbours(it).asSequence().forEach {
+                        val chainedEntity = room.entityAt(it.pos, true)
+                        if(chainedEntity is Enemy) {
+                            if(chainedEntity.group == avoidGroup && chainedEntity != traveller) {
+                                ++chainedEnemies
+                            }
                         }
                     }
                 }
@@ -176,10 +171,9 @@ class PathFinder(val room: RoomState) {
 
         if(consecutiveEnemies > 1) {
             chainedEnemies += consecutiveEnemies - 1
-            consecutiveEnemies = 1
         }
 
-        return 1 + 5 * consecutiveEnemies + 100 * chainedEnemies
+        return 1 + (100 * consecutiveEnemies) + (10000 * chainedEnemies)
     }
 
 }

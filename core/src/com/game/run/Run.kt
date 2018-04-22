@@ -20,4 +20,19 @@ class Run {
         --health
     }
 
+    fun addHeart() {
+        if(health < maxHealth) {
+            ++health
+        }
+    }
+
+    fun fullyHeal() {
+        health = maxHealth
+    }
+
+    fun addMaxHealth() {
+        ++maxHealth
+        ++health
+    }
+
 }
