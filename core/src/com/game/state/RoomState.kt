@@ -3,6 +3,7 @@ package com.game.state
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.game.entity.*
 import com.game.graphics.GameCanvas
 import com.game.graphics.Sequences
@@ -19,6 +20,9 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
     val particles: MutableList<Particle> = mutableListOf()
     val entities: MutableList<Entity> = mutableListOf()
     val player: Player = Player(this, playerPos)
+    var alreadyCleared: Boolean = false
+    val ladderPos: Tile = Tile(-1, -1)
+    val ladderTexture: TextureRegion = TextureRegion(Textures.get("ladder"))
 
     var turnQueue: MutableList<Entity> = mutableListOf()
     val killSet: MutableSet<Entity> = mutableSetOf()
@@ -46,7 +50,7 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
         if(gameOver) {
             ++gameOverTicks
             if(gameOverTicks > 30 && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-                //TODO: Return to main menu
+                StateManager.queue(MainMenu())
             }
             return
         }
@@ -107,6 +111,11 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
                     openDoors()
                 }
 
+                if(ladderPos.x != -1 && ladderPos.y != -1 && ladderPos.x == player.pos.x && ladderPos.y == player.pos.y) {
+                    Run.current.nextFloor()
+                    return
+                }
+
                 checkExitRoom()
                 player.endIdle()
                 if(player.act()) {
@@ -136,6 +145,10 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
             if(west) { canvas.draw(Textures.get("exit_arrow"), 228f, 240f, rotation = Angle(Math.PI / 2.0)) }
         }
 
+        if(ladderPos.x != -1 && ladderPos.y != -1) {
+            canvas.drawTile(ladderTexture, ladderPos.x * 24, ladderPos.y * 24)
+        }
+
         entities.asSequence().filter { it !is Enemy || enemyPathToShow == -1 || it.id == enemyPathToShow }.forEach { it.drawBG(canvas) }
         entities.asSequence().forEach { it.draw(canvas) }
 
@@ -161,15 +174,17 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
             canvas.draw(Textures.get(if(i >= Run.current.health) "empty_heart" else "heart"),340f, 580f - 20f * i)
         }
 
-        for(i in 0 until Run.current.movements) {
-            canvas.draw(Textures.get(if(i >= player.movesLeft) "empty_boot" else "boot"), 360f, 580f - 20f * i)
-        }
-
-        for(i in 0 until Run.current.attacks) {
-            canvas.draw(Textures.get(if(i >= player.attacksLeft) "empty_sword" else "sword"), 380f, 580f - 20f * i)
-        }
+        canvas.drawText("Floor ${Run.current.difficulty + 1}", 838f, 230f, "prstart", 8, Color.WHITE)
 
         if(combat()) {
+            for(i in 0 until Run.current.movements) {
+                canvas.draw(Textures.get(if(i >= player.movesLeft) "empty_boot" else "boot"), 360f, 580f - 20f * i)
+            }
+
+            for(i in 0 until Run.current.attacks) {
+                canvas.draw(Textures.get(if(i >= player.attacksLeft) "empty_sword" else "sword"), 380f, 580f - 20f * i)
+            }
+
             if(isPlayerTurn()) {
                 canvas.drawText("Q: End turn", 840f, 580f, "prstart", 8, Color.WHITE)
                 canvas.drawText("WASD: Move", 840f, 560f, "prstart", 8, Color.WHITE)
@@ -182,9 +197,15 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
                 canvas.drawText("Enemy\'s turn", 838f, 580f, "prstart", 8, Color.WHITE)
             }
         } else {
-            canvas.drawText("Victory!", 838f, 580f, "prstart", 8, Color.WHITE)
-            canvas.drawText("Time to go to", 838f, 560f, "prstart", 8, Color.WHITE)
-            canvas.drawText("the next room", 838f, 540f, "prstart", 8, Color.WHITE)
+            if(!alreadyCleared) {
+                canvas.drawText("Victory!", 838f, 580f, "prstart", 8, Color.WHITE)
+                canvas.drawText("Time to go to", 838f, 568f, "prstart", 8, Color.WHITE)
+                canvas.drawText("the next room", 838f, 556f, "prstart", 8, Color.WHITE)
+            } else {
+                canvas.drawText("Phew, no", 838f, 580f, "prstart", 8, Color.WHITE)
+                canvas.drawText("enemies here!", 838f, 568f, "prstart", 8, Color.WHITE)
+                canvas.drawText("WASD: Move", 838f, 548f, "prstart", 8, Color.WHITE)
+            }
         }
 
         if(gameOverTicks > 30) {
@@ -336,8 +357,6 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
                             foundMatch = true
                             textPos = chain.first().drawPos()
                         }
-//                        chain.asSequence().forEach { it.endIdle() }
-//                        delay = 20
                     }
                 }
             }

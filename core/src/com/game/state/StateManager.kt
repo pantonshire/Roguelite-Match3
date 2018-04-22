@@ -25,7 +25,8 @@ object StateManager {
 
         layers[0].setCameraPosition(384f, 240f)
 
-        current = Run.current.firstRoom().makeRoom(Direction.NORTH)
+//        current = Run.current.firstRoom().makeRoom(Direction.NORTH)
+        current = MainMenu()
     }
 
     fun tick() {
@@ -54,6 +55,10 @@ object StateManager {
 
     fun queueRoom(newRoom: RoomData, cameFrom: Direction) {
         queued = newRoom.makeRoom(cameFrom)
+    }
+
+    fun queue(state: State) {
+        queued = state
     }
 
 }

@@ -65,6 +65,8 @@ class RoomData(val difficulty: Int,
             room.openDoors()
         }
 
+        room.alreadyCleared = enemies == 0 || cleared
+
         return room
     }
 

@@ -18,7 +18,7 @@ class Run {
         }
     }
 
-    val floor: Array<Array<RoomData?>> = generateFloor()
+    var floor: Array<Array<RoomData?>> = generateFloor()
     val currentRoomPos: Tile = Tile(0, 0)
     var difficulty = 0
 
@@ -31,7 +31,6 @@ class Run {
 
     fun travel(direction: Direction) {
         val newPos = currentRoomPos.offset(direction)
-        println("Travelling $direction")
         if(newPos.x >= 0 && newPos.y >= 0) {
             val newRoom = floor[newPos.x][newPos.y]
             if(newRoom != null) {
@@ -40,6 +39,12 @@ class Run {
                 StateManager.queueRoom(newRoom, direction)
             }
         }
+    }
+
+    fun nextFloor() {
+        ++difficulty
+        floor = generateFloor()
+        StateManager.queueRoom(firstRoom(), Direction.NORTH)
     }
 
     fun loseHeart() {
