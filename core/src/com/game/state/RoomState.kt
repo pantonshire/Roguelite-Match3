@@ -263,7 +263,7 @@ class RoomState(playerPos: Tile, val north: Boolean, val east: Boolean, val sout
                 }
 
                 if(others < 2) {
-                    entities.filter { it is Enemy && it.group == group }.forEach { killSet += it }
+                    entities.filter { it is Enemy && it.group == group && !it.invincible }.forEach { killSet += it }
                 }
             }
         }
